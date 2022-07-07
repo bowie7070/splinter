@@ -12,6 +12,7 @@
 #include <testfunctions.h>
 #include <catch2/catch_all.hpp>
 #include <iostream>
+#include <iomanip>
 #include <bsplinebuilder.h>
 
 using namespace std;
