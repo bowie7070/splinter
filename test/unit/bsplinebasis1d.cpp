@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <Catch.h>
+#include <catch2/catch_all.hpp>
 #include <bsplinebasis1d.h>
 
 using namespace SPLINTER;

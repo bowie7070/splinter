@@ -10,7 +10,7 @@
 #include "testingutilities.h"
 #include <utilities.h>
 #include <testfunctions.h>
-#include <Catch.h>
+#include <catch2/catch_all.hpp>
 #include <iostream>
 #include <bsplinebuilder.h>
 

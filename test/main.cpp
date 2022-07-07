@@ -8,7 +8,7 @@
 */
 
 #define CATCH_CONFIG_RUNNER
-#include <Catch.h>
+#include <catch2/catch_all.hpp>
 #include <testfunction.h>
 #include <testfunctions.h>
 

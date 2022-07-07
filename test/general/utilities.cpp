@@ -8,7 +8,7 @@
 */
 
 #include <operatoroverloads.h>
-#include <Catch.h>
+#include <catch2/catch_all.hpp>
 #include <utilities.h>
 #include <testingutilities.h>
 #include <limits>
