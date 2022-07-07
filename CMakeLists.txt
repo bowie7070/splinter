@@ -12,7 +12,7 @@ project(SPLINTER CXX)
 # Read the SPLINTER version from version file
 file(STRINGS "version" VERSION)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 
 find_package(Catch2 CONFIG REQUIRED)

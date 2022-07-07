@@ -38,7 +38,7 @@ The current goals with the library are:
 The simplest way to contribute to SPLINTER is to use it and give us feedback on the experience. If you would like to contribute by coding, you can get started by picking a suitable issue from the [list of issues](https://github.com/bgrimstad/splinter/issues). The issues are labeled with the type of work (`Bug`, `Docs`, `Enhancement`, `New feature`, `Refactoring`, `Tests`) and level of difficulty (`Beginner`, `Intermediate`, `Advanced`). Some issues are also labeled as `Critical`, which means that they deserve our attention and prioritization.
 
 ### Requirements for use
-A standards compliant C++11 compiler.
+A standards compliant C++17 compiler.
 
 ### Guides
 * [Basic usage](docs/basic_usage.md)
