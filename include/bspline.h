@@ -67,6 +67,13 @@ public:
     DenseMatrix evalJacobian(DenseVector x) const override;
     DenseMatrix evalHessian(DenseVector x) const override;
 
+    double operator()(DenseVector const& x) const { return eval(x); }
+    double operator()(double const x0) const {
+        DenseVector x(1);
+        x[0] = x0;
+        return eval(x);
+    }
+
     // Evaluation of B-spline basis functions
     SparseVector evalBasis(DenseVector x) const;
     SparseMatrix evalBasisJacobian(DenseVector x) const;
