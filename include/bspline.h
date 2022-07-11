@@ -19,7 +19,7 @@ namespace SPLINTER
 /**
  * Class that implements the multivariate tensor product B-spline
  */
-class SPLINTER_API BSpline final : public Function
+class SPLINTER_API BSpline final : private Function
 {
 public:
     /**
@@ -44,6 +44,8 @@ public:
      */
     BSpline(const char *fileName);
     BSpline(const std::string &fileName);
+
+    using Function::getNumVariables;
 
     virtual BSpline* clone() const { return new BSpline(*this); }
  
