@@ -19,7 +19,7 @@ namespace SPLINTER
 /**
  * Class that implements the multivariate tensor product B-spline
  */
-class SPLINTER_API BSpline : public Function
+class SPLINTER_API BSpline final : public Function
 {
 public:
     /**
@@ -57,9 +57,9 @@ public:
     using Function::evalHessian;
 
     // Evaluation of B-spline
-    double eval(DenseVector x) const override;
-    DenseMatrix evalJacobian(DenseVector x) const override;
-    DenseMatrix evalHessian(DenseVector x) const override;
+    double eval(DenseVector x) const final;
+    DenseMatrix evalJacobian(DenseVector x) const final;
+    DenseMatrix evalHessian(DenseVector x) const final;
 
     double operator()(DenseVector const& x) const { return eval(x); }
     double operator()(double const x0) const { 
@@ -128,9 +128,9 @@ public:
     // Insert a knot until desired knot multiplicity is obtained
     void insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
-    void save(const std::string &fileName) const override;
+    void save(const std::string &fileName) const final;
 
-    std::string getDescription() const override;
+    std::string getDescription() const final;
 
 protected:
     BSpline();
@@ -155,7 +155,7 @@ private:
     // Helper functions
     bool pointInDomain(DenseVector x) const;
 
-    void load(const std::string &fileName) override;
+    void load(const std::string &fileName) final;
 
     friend class Serializer;
     friend bool operator==(const BSpline &lhs, const BSpline &rhs);
