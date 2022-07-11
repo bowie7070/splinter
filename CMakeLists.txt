@@ -37,6 +37,7 @@ target_sources(splinter PRIVATE
     include/mykroneckerproduct.h
     include/saveable.h
     include/serializer.h
+    include/splinter.h
     include/utilities.h
     src/bsplinebasis1d.cpp
     src/bsplinebasis.cpp
