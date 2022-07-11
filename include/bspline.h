@@ -53,16 +53,6 @@ public:
 
     virtual BSpline* clone() const { return new BSpline(*this); }
 
-    /**
-     * Evaluation of B-spline
-     */
-
-    // Avoid name hiding
-    using Function::eval;
-    using Function::evalHessian;
-    using Function::evalJacobian;
-
-    // Evaluation of B-spline
     double eval(DenseVector x) const final;
     DenseMatrix evalJacobian(DenseVector x) const final;
     DenseMatrix evalHessian(DenseVector x) const final;
