@@ -42,38 +42,16 @@ bool equalsWithinRange(double a, double b, double margin)
     return b - margin <= a && a <= b + margin;
 }
 
-bool compareFunctions(const Function &f1, const Function &f2)
-{
-    int dim = f1.getNumVariables();
-    auto start = std::vector<double>(dim);
-    auto end = std::vector<double>(dim);
-    auto numPoints = std::vector<unsigned int>(dim);
 
-    // Try to avoid testing at "nice" values,
-    // as that is likely where the function was sampled.
-    for(int i = 0; i < dim; i++) {
-        start.at(i) = -10.0;
-        end.at(i) = 10.0;
-        numPoints.at(i) = 10;
-    }
 
-    auto points = linspace(start, end, numPoints);
-
-    return compareFunctions(f1, f2, points);
-}
-
-bool compareFunctions(const Function &exact, const Function &approx, const std::vector<std::vector<double>> &points)
-{
-    // Max value of the norms of function/jacobian/hessian errors
-    const double one_norm_epsilon = 0.1;
-    const double two_norm_epsilon = 0.1;
-    const double inf_norm_epsilon = 0.1;
-
-    return compareFunctions(exact, approx, points, one_norm_epsilon, two_norm_epsilon, inf_norm_epsilon);
-}
-
-bool compareFunctions(const Function &exact, const Function &approx, const std::vector<std::vector<double>> &points, double one_norm_epsilon, double two_norm_epsilon, double inf_norm_epsilon)
-{
+template <class exact_type, class approx_type>
+bool compareFunctions(
+    const exact_type& exact,
+    const approx_type& approx,
+    const std::vector<std::vector<double>>& points,
+    double one_norm_epsilon,
+    double two_norm_epsilon,
+    double inf_norm_epsilon) {
     bool equal = true;
 
     REQUIRE(exact.getNumVariables() == approx.getNumVariables());
@@ -225,6 +203,45 @@ bool compareFunctions(const Function &exact, const Function &approx, const std::
     }
 
     return equal;
+}
+
+
+template <class exact_type, class approx_type>
+bool compareFunctions(
+    const exact_type& exact,
+    const approx_type& approx,
+    const std::vector<std::vector<double>>& points) {
+    // Max value of the norms of function/jacobian/hessian errors
+    const double one_norm_epsilon = 0.1;
+    const double two_norm_epsilon = 0.1;
+    const double inf_norm_epsilon = 0.1;
+
+    return compareFunctions(
+        exact,
+        approx,
+        points,
+        one_norm_epsilon,
+        two_norm_epsilon,
+        inf_norm_epsilon);
+}
+
+bool compareFunctions(const Function& f1, const Function& f2) {
+    int dim        = f1.getNumVariables();
+    auto start     = std::vector<double>(dim);
+    auto end       = std::vector<double>(dim);
+    auto numPoints = std::vector<unsigned int>(dim);
+
+    // Try to avoid testing at "nice" values,
+    // as that is likely where the function was sampled.
+    for (int i = 0; i < dim; i++) {
+        start.at(i)     = -10.0;
+        end.at(i)       = 10.0;
+        numPoints.at(i) = 10;
+    }
+
+    auto points = linspace(start, end, numPoints);
+
+    return compareFunctions(f1, f2, points);
 }
 
 void compareFunctionValue(std::vector<TestFunction *> funcs,

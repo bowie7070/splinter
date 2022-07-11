@@ -18,7 +18,7 @@ namespace SPLINTER {
 /**
  * Class that implements the multivariate tensor product B-spline
  */
-class SPLINTER_API BSpline final : public Function {
+class SPLINTER_API BSpline final : private Function {
 public:
     /**
      * Builder class for construction by regression
@@ -50,6 +50,8 @@ public:
      */
     BSpline(char const* fileName);
     BSpline(std::string const& fileName);
+
+    using Function::getNumVariables;
 
     virtual BSpline* clone() const { return new BSpline(*this); }
 
