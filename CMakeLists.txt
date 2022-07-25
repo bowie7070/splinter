@@ -33,7 +33,6 @@ target_sources(splinter PRIVATE
     include/knots.h
     include/linearsolvers.h
     include/mykroneckerproduct.h
-    include/saveable.h
     include/splinter.h
     include/utilities.h
     src/bsplinebasis1d.cpp

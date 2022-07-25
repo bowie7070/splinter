@@ -56,15 +56,6 @@ BSpline::BSpline(
     checkControlPoints();
 }
 
-/*
- * Construct from saved data
- */
-BSpline::BSpline(char const* fileName) : BSpline(std::string(fileName)) {}
-
-BSpline::BSpline(std::string const& fileName) : Function(1) {
-    load(fileName);
-}
-
 /**
  * Returns the function value at x
  */
@@ -377,14 +368,6 @@ bool BSpline::removeUnsupportedBasisFunctions(
     updateControlPoints(A.transpose());
 
     return true;
-}
-
-void BSpline::save(std::string const& fileName) const {
-    std::abort();
-}
-
-void BSpline::load(std::string const& fileName) {
-    std::abort();
 }
 
 std::string BSpline::getDescription() const {

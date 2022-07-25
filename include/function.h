@@ -11,7 +11,6 @@
 #define SPLINTER_FUNCTION_H
 
 #include "definitions.h"
-#include "saveable.h"
 
 namespace SPLINTER {
 
@@ -19,9 +18,8 @@ namespace SPLINTER {
  * Interface for functions
  * All functions working with standard C++11 types are defined in terms of their Eigen counterparts.
  * Default implementations of jacobian and hessian evaluation is using central difference.
- * TODO: Remove current requirement that all functions must implement save and load!
  */
-class SPLINTER_API Function : public Saveable {
+class SPLINTER_API Function {
 public:
     Function() : Function(1) {}
 

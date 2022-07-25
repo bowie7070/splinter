@@ -26,12 +26,6 @@ DataTable::DataTable(bool allowDuplicates, bool allowIncompleteGrid) :
     numDuplicates(0),
     numVariables(0) {}
 
-DataTable::DataTable(char const* fileName) : DataTable(std::string(fileName)) {}
-
-DataTable::DataTable(std::string const& fileName) {
-    load(fileName);
-}
-
 void DataTable::addSample(double x, double y) {
     addSample(DataPoint(x, y));
 }
@@ -110,14 +104,6 @@ void DataTable::gridCompleteGuard() const {
         throw Exception(
             "DataTable::gridCompleteGuard: The grid is not complete yet!");
     }
-}
-
-void DataTable::save(std::string const& fileName) const {
-    std::abort();
-}
-
-void DataTable::load(std::string const& fileName) {
-    std::abort();
 }
 
 /*
