@@ -26,9 +26,7 @@ BSplineBasis1D::BSplineBasis1D(
     //    if (degree <= 0)
     //        throw Exception("BSplineBasis1D::BSplineBasis1D: Cannot create B-spline basis functions of degree <= 0.");
 
-    if (!isKnotVectorRegular(knots, degree))
-        throw Exception(
-            "BSplineBasis1D::BSplineBasis1D: Knot vector is not regular.");
+    assert(isKnotVectorRegular(knots, degree));
 }
 
 SparseVector BSplineBasis1D::eval(double x) const {
@@ -243,9 +241,7 @@ BSplineBasis1D::insertKnots(double tau, unsigned int multiplicity) {
     for (unsigned int i = 0; i < multiplicity; i++)
         extKnots.insert(extKnots.begin() + index + 1, tau);
 
-    if (!isKnotVectorRegular(extKnots, degree))
-        throw Exception(
-            "BSplineBasis1D::insertKnots: New knot vector is not regular!");
+    assert(isKnotVectorRegular(extKnots, degree));
 
     // Return knot insertion matrix
     SparseMatrix A = buildKnotInsertionMatrix(extKnots);
@@ -270,13 +266,9 @@ SparseMatrix BSplineBasis1D::refineKnots() {
             newKnot);
     }
 
-    if (!isKnotVectorRegular(refinedKnots, degree))
-        throw Exception(
-            "BSplineBasis1D::refineKnots: New knot vector is not regular!");
+    assert(isKnotVectorRegular(refinedKnots, degree));
 
-    if (!isKnotVectorRefinement(knots, refinedKnots))
-        throw Exception(
-            "BSplineBasis1D::refineKnots: New knot vector is not a proper refinement!");
+    assert(isKnotVectorRefinement(knots, refinedKnots));
 
     // Return knot insertion matrix
     SparseMatrix A = buildKnotInsertionMatrix(refinedKnots);
@@ -330,13 +322,9 @@ SparseMatrix BSplineBasis1D::refineKnotsLocally(double x) {
     // Insert new knot
     refinedKnots.insert(upper, insertVal);
 
-    if (!isKnotVectorRegular(refinedKnots, degree))
-        throw Exception(
-            "BSplineBasis1D::refineKnotsLocally: New knot vector is not regular!");
+    assert(isKnotVectorRegular(refinedKnots, degree));
 
-    if (!isKnotVectorRefinement(knots, refinedKnots))
-        throw Exception(
-            "BSplineBasis1D::refineKnotsLocally: New knot vector is not a proper refinement!");
+    assert(isKnotVectorRefinement(knots, refinedKnots));
 
     // Build knot insertion matrix
     SparseMatrix A = buildKnotInsertionMatrix(refinedKnots);
@@ -366,13 +354,9 @@ SparseMatrix BSplineBasis1D::decomposeToBezierForm() {
             std::upper_bound(refinedKnots.begin(), refinedKnots.end(), *knoti);
     }
 
-    if (!isKnotVectorRegular(refinedKnots, degree))
-        throw Exception(
-            "BSplineBasis1D::refineKnots: New knot vector is not regular!");
+    assert(isKnotVectorRegular(refinedKnots, degree));
 
-    if (!isKnotVectorRefinement(knots, refinedKnots))
-        throw Exception(
-            "BSplineBasis1D::refineKnots: New knot vector is not a proper refinement!");
+    assert(isKnotVectorRefinement(knots, refinedKnots));
 
     // Return knot insertion matrix
     SparseMatrix A = buildKnotInsertionMatrix(refinedKnots);
@@ -385,13 +369,9 @@ SparseMatrix BSplineBasis1D::decomposeToBezierForm() {
 
 SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
     std::vector<double> const& refinedKnots) const {
-    if (!isKnotVectorRegular(refinedKnots, degree))
-        throw Exception(
-            "BSplineBasis1D::buildKnotInsertionMatrix: New knot vector is not regular!");
+    assert(isKnotVectorRegular(refinedKnots, degree));
 
-    if (!isKnotVectorRefinement(knots, refinedKnots))
-        throw Exception(
-            "BSplineBasis1D::buildKnotInsertionMatrix: New knot vector is not a proper refinement!");
+    assert(isKnotVectorRefinement(knots, refinedKnots));
 
     std::vector<double> knotsAug = refinedKnots;
     unsigned int n               = knots.size() - degree - 1;
