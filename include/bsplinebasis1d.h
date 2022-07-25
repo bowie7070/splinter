@@ -80,7 +80,6 @@ private:
     std::vector<double> knots;
     unsigned int targetNumBasisfunctions;
 
-    friend class Serializer;
     friend bool
     operator==(BSplineBasis1D const& lhs, BSplineBasis1D const& rhs);
     friend bool

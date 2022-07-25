@@ -36,7 +36,6 @@ target_sources(splinter PRIVATE
     include/linearsolvers.h
     include/mykroneckerproduct.h
     include/saveable.h
-    include/serializer.h
     include/splinter.h
     include/utilities.h
     src/bsplinebasis1d.cpp
@@ -53,7 +52,6 @@ target_sources(splinter PRIVATE
     src/function.cpp
     src/knots.cpp
     src/mykroneckerproduct.cpp
-    src/serializer.cpp
     src/utilities.cpp
 )
 
@@ -76,9 +74,6 @@ if(Catch2_FOUND)
         test/main.cpp
         test/operatoroverloads.cpp
         test/operatoroverloads.h
-        test/serialization/bspline.cpp
-        test/serialization/datatable.cpp
-        test/serialization/eigentypes.cpp
         test/testfunction.cpp
         test/testfunction.h
         test/testfunctions.cpp

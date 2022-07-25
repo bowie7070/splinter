@@ -76,7 +76,6 @@ private:
 
     void load(std::string const& fileName);
 
-    friend class Serializer;
     friend bool operator==(DataTable const& lhs, DataTable const& rhs);
 };
 

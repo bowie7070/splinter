@@ -12,7 +12,6 @@
 #include "unsupported/Eigen/KroneckerProduct"
 #include <iostream>
 #include <linearsolvers.h>
-#include <serializer.h>
 #include <utilities.h>
 
 namespace SPLINTER {

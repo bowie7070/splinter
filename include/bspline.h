@@ -151,7 +151,6 @@ private:
 
     void load(std::string const& fileName) final;
 
-    friend class Serializer;
     friend bool operator==(BSpline const& lhs, BSpline const& rhs);
 };
 
