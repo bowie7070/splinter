@@ -12,6 +12,8 @@
 
 #include "definitions.h"
 #include "bsplinebasis1d.h"
+#include "mykroneckerproduct.h"
+#include <unsupported/Eigen/KroneckerProduct>
 
 namespace SPLINTER
 {
@@ -23,7 +25,18 @@ public:
     BSplineBasis(std::vector<std::vector<double>> &knotVectors, std::vector<unsigned int> basisDegrees);
 
     // Evaluation
-    SparseVector eval(const DenseVector &x) const;
+    template <class x_type>
+    SparseVector eval(const x_type &x) const
+    {
+        // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
+        std::vector<SparseVector> basisFunctionValues;
+
+        for (int var = 0; var < x.size(); var++)
+            basisFunctionValues.push_back(bases[var].eval(x[var]));
+
+        return kroneckerProductVectors(basisFunctionValues);
+    }
+
     DenseMatrix evalBasisJacobianOld(DenseVector &x) const; // Depricated
     SparseMatrix evalBasisJacobian(DenseVector &x) const;
     SparseMatrix evalBasisJacobian2(DenseVector &x) const; // A bit slower than evaBasisJacobianOld()

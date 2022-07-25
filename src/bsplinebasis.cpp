@@ -8,8 +8,6 @@
 */
 
 #include "bsplinebasis.h"
-#include "mykroneckerproduct.h"
-#include "unsupported/Eigen/KroneckerProduct"
 
 #include <iostream>
 
@@ -41,16 +39,6 @@ BSplineBasis::BSplineBasis(std::vector< std::vector<double> > &knotVectors, std:
     }
 }
 
-SparseVector BSplineBasis::eval(const DenseVector &x) const
-{
-    // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
-    std::vector<SparseVector> basisFunctionValues;
-
-    for (int var = 0; var < x.size(); var++)
-        basisFunctionValues.push_back(bases.at(var).eval(x(var)));
-
-    return kroneckerProductVectors(basisFunctionValues);
-}
 
 // Old implementation of Jacobian
 DenseMatrix BSplineBasis::evalBasisJacobianOld(DenseVector &x) const
