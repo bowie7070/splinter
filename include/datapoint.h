@@ -20,30 +20,69 @@ namespace SPLINTER {
  * Note that x is a vector and y is a scalar.
  */
 class DataPoint {
-public:
-    DataPoint(double x, double y);
-    DataPoint(std::vector<double> x, double y);
-    DataPoint(DenseVector x, double y);
+    using x_type = std::vector<double>;
 
-    bool
-    operator<(DataPoint const& rhs) const; // Returns false if the two are equal
+    static x_type as_x_type(DenseVector const& x) {
+        std::vector<double> newX;
+
+        for (int i = 0; i < x.size(); i++) {
+            newX.push_back(x(i));
+        }
+
+        return newX;
+    }
+
+public:
+    DataPoint(double x, double y) : x(1, x), y(y) {}
+
+    DataPoint(std::vector<double> x, double y) : x(x), y(y) {}
+
+    DataPoint(DenseVector const& x, double y) : x(as_x_type(x)), y(y) {}
+
+    bool operator<(DataPoint const& rhs) const {
+        if (this->getDimX() != rhs.getDimX())
+            throw Exception(
+                "DataPoint::operator<: Cannot compare data points of different dimensions");
+
+        return x < rhs.x;
+    }
 
     std::vector<double> getX() const { return x; }
     double getY() const { return y; }
     unsigned int getDimX() const { return x.size(); }
 
 private:
-    DataPoint();
-
     std::vector<double> x;
     double y;
-    void setData(std::vector<double> const& x, double y);
 };
 
-// Measure distance between two points
-double dist(const std::vector<double> x, const std::vector<double> y);
-double dist(const DataPoint x, const DataPoint y);
-bool dist_sort(const DataPoint x, const DataPoint y);
+/*
+* Computes Euclidean distance ||x-y||
+*/
+inline double dist(const std::vector<double> x, const std::vector<double> y) {
+    if (x.size() != y.size())
+        throw Exception(
+            "DataPoint::dist: Cannot measure distance between two points of different dimension");
+    double sum = 0.0;
+    for (unsigned int i = 0; i < x.size(); i++)
+        sum += (x.at(i) - y.at(i)) * (x.at(i) - y.at(i));
+    return std::sqrt(sum);
+}
+
+/*
+* Computes Euclidean distance ||x-y||
+*/
+inline double dist(const DataPoint x, const DataPoint y) {
+    return dist(x.getX(), y.getX());
+}
+
+inline bool dist_sort(const DataPoint x, const DataPoint y) {
+    std::vector<double> zeros(x.getDimX(), 0);
+    DataPoint origin(zeros, 0.0);
+    double x_dist = dist(x, origin);
+    double y_dist = dist(y, origin);
+    return (x_dist < y_dist);
+}
 
 } // namespace SPLINTER
 
