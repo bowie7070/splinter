@@ -98,11 +98,11 @@ bool operator==(const DataPoint &lhs, const DataPoint &rhs)
 {
     for (unsigned int i = 0; i < lhs.getDimX(); i++)
     {
-        if (!equalsWithinRange(lhs.getX().at(i), rhs.getX().at(i)))
+        if (!equalsWithinRange(lhs.x.at(i), rhs.x.at(i)))
             return false;
     }
 
-    if (!equalsWithinRange(lhs.getY(), rhs.getY()))
+    if (!equalsWithinRange(lhs.y, rhs.y))
         return false;
 
     return true;
@@ -156,14 +156,14 @@ bool operator!=(const DataPoint &lhs, const DataPoint &rhs)
 std::ostream &operator<<(std::ostream &out, const DataPoint &sample) {
     out << "(";
     bool firstLoop = true;
-    for (auto val : sample.getX()) {
+    for (auto val : sample.x) {
         if (!firstLoop) {
             out << ", ";
         }
         out << val;
         firstLoop = false;
     }
-    out << ") = (" << sample.getY() << ")";
+    out << ") = (" << sample.y << ")";
 
     return out;
 }
