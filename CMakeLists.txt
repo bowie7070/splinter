@@ -15,10 +15,9 @@ file(STRINGS "version" VERSION)
 set(CMAKE_CXX_STANDARD 17)
 
 
-find_package(Catch2 CONFIG REQUIRED)
+find_package(Catch2 CONFIG)
 find_package(Eigen3 CONFIG REQUIRED)
 
-include(Catch)
 
 add_library(splinter)
 target_sources(splinter PRIVATE
@@ -62,41 +61,45 @@ target_link_libraries(splinter PUBLIC
     Eigen3::Eigen
 )
 
-# Testing executable
-add_executable(splinter-test)
-target_sources(splinter-test PRIVATE
-    test/approximation/bspline.cpp
-    test/approximation/pspline.cpp
-    test/bsplinetestingutilities.cpp
-    test/bsplinetestingutilities.h
-    test/general/bspline.cpp
-    test/general/datatable.cpp
-    test/general/utilities.cpp
-    test/main.cpp
-    test/operatoroverloads.cpp
-    test/operatoroverloads.h
-    test/serialization/bspline.cpp
-    test/serialization/datatable.cpp
-    test/serialization/eigentypes.cpp
-    test/testfunction.cpp
-    test/testfunction.h
-    test/testfunctions.cpp
-    test/testfunctions.h
-    test/testingutilities.cpp
-    test/testingutilities.h
-    test/unit/bsplinebasis1d.cpp
-    test/unit/knots.cpp
-)
+if(Catch2_FOUND)
+    # Testing executable
+    add_executable(splinter-test)
+    target_sources(splinter-test PRIVATE
+        test/approximation/bspline.cpp
+        test/approximation/pspline.cpp
+        test/bsplinetestingutilities.cpp
+        test/bsplinetestingutilities.h
+        test/general/bspline.cpp
+        test/general/datatable.cpp
+        test/general/utilities.cpp
+        test/main.cpp
+        test/operatoroverloads.cpp
+        test/operatoroverloads.h
+        test/serialization/bspline.cpp
+        test/serialization/datatable.cpp
+        test/serialization/eigentypes.cpp
+        test/testfunction.cpp
+        test/testfunction.h
+        test/testfunctions.cpp
+        test/testfunctions.h
+        test/testingutilities.cpp
+        test/testingutilities.h
+        test/unit/bsplinebasis1d.cpp
+        test/unit/knots.cpp
+    )
 
-target_include_directories(splinter-test PRIVATE
-    test
-)
-target_link_libraries(splinter-test PRIVATE
-    splinter
-    Catch2::Catch2
-)
+    include(Catch)
 
-catch_discover_tests(splinter-test)
+    target_include_directories(splinter-test PRIVATE
+        test
+    )
+    target_link_libraries(splinter-test PRIVATE
+        splinter
+        Catch2::Catch2
+    )
+
+    catch_discover_tests(splinter-test)
+endif()
 
 # Install the shared library file
 install(
