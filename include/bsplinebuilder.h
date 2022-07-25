@@ -11,7 +11,7 @@
 #define SPLINTER_BSPLINEBUILDER_H
 
 #include "bspline.h"
-#include "datatable.h"
+#include <linearsolvers.h>
 
 namespace SPLINTER {
 
@@ -102,14 +102,240 @@ private:
         return std::vector<unsigned int>(numVariables, degree);
     }
 
+    auto computeBasisFunctionMatrix(BSpline const& bspline) const {
+        unsigned int numVariables = _data.getNumVariables();
+        unsigned int numSamples   = _data.getNumSamples();
+
+        // TODO: Reserve nnz per row (degree+1)
+        //int nnzPrCol = bspline.basis.supportedPrInterval();
+
+        SparseMatrix A(numSamples, bspline.getNumBasisFunctions());
+        //A.reserve(DenseVector::Constant(numSamples, nnzPrCol)); // TODO: should reserve nnz per row!
+
+        int i = 0;
+        for (auto it = _data.cbegin(); it != _data.cend(); ++it, ++i) {
+            DenseVector xi(numVariables);
+            xi.setZero();
+            std::vector<double> xv = it->x;
+            for (unsigned int j = 0; j < numVariables; ++j) {
+                xi(j) = xv.at(j);
+            }
+
+            SparseVector basisValues = bspline.evalBasis(xi);
+
+            for (SparseVector::InnerIterator it2(basisValues); it2; ++it2) {
+                A.insert(i, it2.index()) = it2.value();
+            }
+        }
+
+        A.makeCompressed();
+
+        return A;
+    }
+
+    /*
+    * Function for generating second order finite-difference matrix, which is used for penalizing the
+    * (approximate) second derivative in control point calculation for P-splines.
+    */
+    auto getSecondOrderFiniteDifferenceMatrix(BSpline const& bspline) const {
+        unsigned int numVariables = bspline.getNumVariables();
+
+        // Number of (total) basis functions - defines the number of columns in D
+        unsigned int numCols = bspline.getNumBasisFunctions();
+        std::vector<unsigned int> numBasisFunctions =
+            bspline.getNumBasisFunctionsPerVariable();
+
+        // Number of basis functions (and coefficients) in each variable
+        std::vector<unsigned int> dims;
+        for (unsigned int i = 0; i < numVariables; i++)
+            dims.push_back(numBasisFunctions.at(i));
+
+        std::reverse(dims.begin(), dims.end());
+
+        for (unsigned int i = 0; i < numVariables; ++i)
+            if (numBasisFunctions.at(i) < 3)
+                throw Exception(
+                    "BSpline::Builder::getSecondOrderDifferenceMatrix: Need at least three coefficients/basis function per variable.");
+
+        // Number of rows in D and in each block
+        int numRows = 0;
+        std::vector<int> numBlkRows;
+        for (unsigned int i = 0; i < numVariables; i++) {
+            int prod = 1;
+            for (unsigned int j = 0; j < numVariables; j++) {
+                if (i == j)
+                    prod *= (dims[j] - 2);
+                else
+                    prod *= dims[j];
+            }
+            numRows += prod;
+            numBlkRows.push_back(prod);
+        }
+
+        // Resize and initialize D
+        SparseMatrix D(numRows, numCols);
+        D.reserve(DenseVector::Constant(
+            numCols,
+            2 * numVariables)); // D has no more than two elems per col per dim
+
+        int i = 0; // Row index
+        // Loop though each dimension (each dimension has its own block)
+        for (unsigned int d = 0; d < numVariables; d++) {
+            // Calculate left and right products
+            int leftProd  = 1;
+            int rightProd = 1;
+            for (unsigned int k = 0; k < d; k++) {
+                leftProd *= dims[k];
+            }
+            for (unsigned int k = d + 1; k < numVariables; k++) {
+                rightProd *= dims[k];
+            }
+
+            // Loop through subblocks on the block diagonal
+            for (int j = 0; j < rightProd; j++) {
+                // Start column of current subblock
+                int blkBaseCol = j * leftProd * dims[d];
+                // Block rows [I -2I I] of subblock
+                for (unsigned int l = 0; l < (dims[d] - 2); l++) {
+                    // Special case for first dimension
+                    if (d == 0) {
+                        int k          = j * leftProd * dims[d] + l;
+                        D.insert(i, k) = 1;
+                        k += leftProd;
+                        D.insert(i, k) = -2;
+                        k += leftProd;
+                        D.insert(i, k) = 1;
+                        i++;
+                    } else {
+                        // Loop for identity matrix
+                        for (int n = 0; n < leftProd; n++) {
+                            int k          = blkBaseCol + l * leftProd + n;
+                            D.insert(i, k) = 1;
+                            k += leftProd;
+                            D.insert(i, k) = -2;
+                            k += leftProd;
+                            D.insert(i, k) = 1;
+                            i++;
+                        }
+                    }
+                }
+            }
+        }
+
+        D.makeCompressed();
+
+        return D;
+    }
+
+    /*
+    * Find coefficients of B-spline by solving:
+    * min ||A*x - b||^2 + alpha*||R||^2,
+    * where
+    * A = mxn matrix of n basis functions evaluated at m sample points,
+    * b = vector of m sample points y-values (or x-values when calculating knot averages),
+    * x = B-spline coefficients (or knot averages),
+    * R = Regularization matrix,
+    * alpha = regularization parameter.
+    */
+    DenseVector computeCoefficients(BSpline const& bspline) const {
+        auto const B  = computeBasisFunctionMatrix(bspline);
+        auto A        = B;
+        DenseVector b = getSamplePointValues();
+
+        if (_smoothing == Smoothing::IDENTITY) {
+            /*
+            * Computing B-spline coefficients with a regularization term
+            * ||Ax-b||^2 + alpha*x^T*x
+            *
+            * NOTE: This corresponds to a Tikhonov regularization (or ridge regression) with the Identity matrix.
+            * See: https://en.wikipedia.org/wiki/Tikhonov_regularization
+            *
+            * NOTE2: consider changing regularization factor to (alpha/numSample)
+            */
+            A = B.transpose() * B;
+            b = B.transpose() * b;
+
+            auto I = SparseMatrix(A.cols(), A.cols());
+            I.setIdentity();
+            A += _alpha * I;
+        } else if (_smoothing == Smoothing::PSPLINE) {
+            /*
+            * The P-Spline is a smooting B-spline which relaxes the interpolation constraints on the control points to allow
+            * smoother spline curves. It minimizes an objective which penalizes both deviation from sample points (to lower bias)
+            * and the magnitude of second derivatives (to lower variance).
+            *
+            * Setup and solve equations Ax = b,
+            * A = B'*W*B + l*D'*D
+            * b = B'*W*y
+            * x = control coefficients or knot averages.
+            * B = basis functions at sample x-values,
+            * W = weighting matrix for interpolating specific points
+            * D = second-order finite difference matrix
+            * l = penalizing parameter (increase for more smoothing)
+            * y = sample y-values when calculating control coefficients,
+            * y = sample x-values when calculating knot averages
+            */
+
+            // Assuming regular grid
+            unsigned int numSamples = _data.getNumSamples();
+
+            // Weight matrix
+            SparseMatrix W;
+            W.resize(numSamples, numSamples);
+            W.setIdentity();
+
+            // Second order finite difference matrix
+            auto const D = getSecondOrderFiniteDifferenceMatrix(bspline);
+
+            // Left-hand side matrix
+            A = B.transpose() * W * B + _alpha * D.transpose() * D;
+
+            // Compute right-hand side matrices
+            b = B.transpose() * W * b;
+        }
+
+        DenseVector x;
+
+        int numEquations    = A.rows();
+        int maxNumEquations = 100;
+        bool solveAsDense   = (numEquations < maxNumEquations);
+
+        if (!solveAsDense) {
+#ifndef NDEBUG
+            std::cout
+                << "BSpline::Builder::computeBSplineCoefficients: Computing B-spline control points using sparse solver."
+                << std::endl;
+#endif // NDEBUG
+
+            SparseLU<> s;
+            //bool successfulSolve = (s.solve(A,Bx,Cx) && s.solve(A,By,Cy));
+
+            solveAsDense = !s.solve(A, b, x);
+        }
+
+        if (solveAsDense) {
+#ifndef NDEBUG
+            std::cout
+                << "BSpline::Builder::computeBSplineCoefficients: Computing B-spline control points using dense solver."
+                << std::endl;
+#endif // NDEBUG
+
+            DenseMatrix Ad = A.toDense();
+            DenseQR<DenseVector> s;
+            // DenseSVD<DenseVector> s;
+            //bool successfulSolve = (s.solve(Ad,Bx,Cx) && s.solve(Ad,By,Cy));
+            if (!s.solve(Ad, b, x)) {
+                throw Exception(
+                    "BSpline::Builder::computeBSplineCoefficients: Failed to solve for B-spline coefficients.");
+            }
+        }
+
+        return x;
+    }
+
     // Control point computations
-    DenseVector computeCoefficients(BSpline const& bspline) const;
     DenseVector computeBSplineCoefficients(BSpline const& bspline) const;
-    SparseMatrix computeBasisFunctionMatrix(BSpline const& bspline) const;
     DenseVector getSamplePointValues() const;
-    // P-spline control point calculation
-    SparseMatrix
-    getSecondOrderFiniteDifferenceMatrix(BSpline const& bspline) const;
 
     // Computing knots
     std::vector<std::vector<double>> computeKnotVectors() const;
