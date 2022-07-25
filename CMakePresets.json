@@ -1,0 +1,17 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "defaults",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceParentDir}/build/${sourceDirName}-${presetName}",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            }
+        }
+    ],
+    "buildPresets": [
+        { "name": "defaults-release", "configurePreset": "defaults", "configuration": "Release" },
+        { "name": "defaults-debug", "configurePreset": "defaults", "configuration": "Debug" }
+    ]
+}
