@@ -114,14 +114,7 @@ private:
 
         int i = 0;
         for (auto it = _data.cbegin(); it != _data.cend(); ++it, ++i) {
-            DenseVector xi(numVariables);
-            xi.setZero();
-            std::vector<double> xv = it->x;
-            for (unsigned int j = 0; j < numVariables; ++j) {
-                xi(j) = xv.at(j);
-            }
-
-            SparseVector basisValues = bspline.evalBasis(xi);
+            SparseVector basisValues = bspline.evalBasis(it->x);
 
             for (SparseVector::InnerIterator it2(basisValues); it2; ++it2) {
                 A.insert(i, it2.index()) = it2.value();
