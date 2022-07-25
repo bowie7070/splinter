@@ -63,13 +63,10 @@ public:
         return x < rhs.x;
     }
 
-    std::vector<double> getX() const { return x; }
-    double getY() const { return y; }
-    unsigned int getDimX() const { return x.size(); }
-
-private:
     std::vector<double> x;
     double y;
+
+    unsigned int getDimX() const { return x.size(); }
 };
 
 /*
@@ -88,9 +85,9 @@ inline double dist(const std::vector<double> x, const std::vector<double> y)
 /*
 * Computes Euclidean distance ||x-y||
 */
-inline double dist(const DataPoint x, const DataPoint y)
+inline double dist(const DataPoint& x, const DataPoint& y)
 {
-    return dist(x.getX(), y.getX());
+    return dist(x.x, y.x);
 }
 
 inline bool dist_sort(const DataPoint x, const DataPoint y)

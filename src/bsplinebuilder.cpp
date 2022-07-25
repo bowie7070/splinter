@@ -178,7 +178,7 @@ SparseMatrix BSpline::Builder::computeBasisFunctionMatrix(const BSpline &bspline
     {
         DenseVector xi(numVariables);
         xi.setZero();
-        std::vector<double> xv = it->getX();
+        std::vector<double> xv = it->x;
         for (unsigned int j = 0; j < numVariables; ++j)
         {
             xi(j) = xv.at(j);
@@ -203,7 +203,7 @@ DenseVector BSpline::Builder::getSamplePointValues() const
 
     int i = 0;
     for (auto it = _data.cbegin(); it != _data.cend(); ++it, ++i)
-        B(i) = it->getY();
+        B(i) = it->y;
 
     return B;
 }

@@ -98,7 +98,7 @@ void DataTable::recordGridPoint(const DataPoint &sample)
 {
     for (unsigned int i = 0; i < getNumVariables(); i++)
     {
-        grid.at(i).insert(sample.getX().at(i));
+        grid.at(i).insert(sample.x.at(i));
     }
 }
 
@@ -179,7 +179,7 @@ std::vector< std::vector<double> > DataTable::getTableX() const
     int i = 0;
     for (auto &sample : samples)
     {
-        std::vector<double> x = sample.getX();
+        std::vector<double> x = sample.x;
 
         for (unsigned int j = 0; j < numVariables; j++)
         {
@@ -197,7 +197,7 @@ std::vector<double> DataTable::getVectorY() const
     std::vector<double> y;
     for (std::multiset<DataPoint>::const_iterator it = cbegin(); it != cend(); ++it)
     {
-        y.push_back(it->getY());
+        y.push_back(it->y);
     }
     return y;
 }
