@@ -26,8 +26,6 @@ target_sources(splinter PRIVATE
     include/bsplinebasis.h
     include/bsplinebuilder.h
     include/bspline.h
-    include/cinterface/cinterface.h
-    include/cinterface/utilities.h
     include/datapoint.h
     include/datatable.h
     include/definitions.h
@@ -42,11 +40,6 @@ target_sources(splinter PRIVATE
     src/bsplinebasis.cpp
     src/bsplinebuilder.cpp
     src/bspline.cpp
-    src/cinterface/bsplinebuilder.cpp
-    src/cinterface/bspline.cpp
-    src/cinterface/cinterface.cpp
-    src/cinterface/datatable.cpp
-    src/cinterface/utilities.cpp
     src/datapoint.cpp
     src/datatable.cpp
     src/function.cpp
