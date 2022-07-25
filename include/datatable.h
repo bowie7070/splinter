@@ -172,9 +172,6 @@ private:
     friend bool operator==(DataTable const& lhs, DataTable const& rhs);
 };
 
-DataTable operator+(DataTable const& lhs, DataTable const& rhs);
-DataTable operator-(DataTable const& lhs, DataTable const& rhs);
-
 } // namespace SPLINTER
 
 #endif // SPLINTER_DATATABLE_H
