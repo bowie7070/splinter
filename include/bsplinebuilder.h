@@ -272,19 +272,14 @@ private:
             // Assuming regular grid
             unsigned int numSamples = _data.getNumSamples();
 
-            // Weight matrix
-            SparseMatrix W;
-            W.resize(numSamples, numSamples);
-            W.setIdentity();
-
             // Second order finite difference matrix
             auto const D = getSecondOrderFiniteDifferenceMatrix(bspline);
 
             // Left-hand side matrix
-            A = B.transpose() * W * B + _alpha * D.transpose() * D;
+            A = B.transpose() * B + _alpha * D.transpose() * D;
 
             // Compute right-hand side matrices
-            b = B.transpose() * W * b;
+            b = B.transpose() * b;
         }
 
         DenseVector x;
