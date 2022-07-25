@@ -39,12 +39,6 @@ public:
     BSpline(std::vector<double> coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
     BSpline(DenseVector coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
 
-    /**
-     * Construct B-spline from file
-     */
-    BSpline(const char *fileName);
-    BSpline(const std::string &fileName);
-
     using Function::getNumVariables;
 
     virtual BSpline* clone() const { return new BSpline(*this); }
@@ -120,8 +114,6 @@ public:
     // Insert a knot until desired knot multiplicity is obtained
     void insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
-    void save(const std::string &fileName) const final;
-
     std::string getDescription() const final;
 
 protected:
@@ -146,8 +138,6 @@ private:
 
     // Helper functions
     bool pointInDomain(DenseVector x) const;
-
-    void load(const std::string &fileName) final;
 
     friend bool operator==(const BSpline &lhs, const BSpline &rhs);
 };

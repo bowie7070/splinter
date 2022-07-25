@@ -28,8 +28,6 @@ public:
     DataTable();
     DataTable(bool allowDuplicates);
     DataTable(bool allowDuplicates, bool allowIncompleteGrid);
-    DataTable(const char *fileName);
-    DataTable(const std::string &fileName); // Load DataTable from file
 
     /*
      * Functions for adding a sample (x,y)
@@ -55,8 +53,6 @@ public:
     
     bool isGridComplete() const;
 
-    void save(const std::string &fileName) const;
-
 private:
     bool allowDuplicates;
     bool allowIncompleteGrid;
@@ -74,8 +70,6 @@ private:
     // Used by functions that require the grid to be complete before they start their operation
     // This function prints a message and exits the program if the grid is not complete.
     void gridCompleteGuard() const;
-
-    void load(const std::string &fileName);
 
     friend bool operator==(const DataTable &lhs, const DataTable &rhs);
 };

@@ -57,20 +57,6 @@ BSpline::BSpline(DenseVector coefficients, std::vector<std::vector<double>> knot
     checkControlPoints();
 }
 
-/*
- * Construct from saved data
- */
-BSpline::BSpline(const char *fileName)
-    : BSpline(std::string(fileName))
-{
-}
-
-BSpline::BSpline(const std::string &fileName)
-    : Function(1)
-{
-    load(fileName);
-}
-
 /**
  * Returns the function value at x
  */
@@ -391,16 +377,6 @@ bool BSpline::removeUnsupportedBasisFunctions(std::vector<double> &lb, std::vect
     updateControlPoints(A.transpose());
 
     return true;
-}
-
-void BSpline::save(const std::string &fileName) const
-{
-    std::abort();
-}
-
-void BSpline::load(const std::string &fileName)
-{
-    std::abort();
 }
 
 std::string BSpline::getDescription() const
