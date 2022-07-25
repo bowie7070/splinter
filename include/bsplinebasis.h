@@ -63,7 +63,6 @@ private:
     std::vector<BSplineBasis1D> bases;
     unsigned int numVariables;
 
-    friend class Serializer;
     friend bool operator==(const BSplineBasis &lhs, const BSplineBasis &rhs);
 };
 

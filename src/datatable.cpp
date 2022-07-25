@@ -13,7 +13,6 @@
 #include <iomanip>
 #include <stdexcept>
 #include <limits>
-#include <serializer.h>
 #include <initializer_list>
 
 namespace SPLINTER
@@ -147,15 +146,12 @@ void DataTable::gridCompleteGuard() const
 
 void DataTable::save(const std::string &fileName) const
 {
-    Serializer s;
-    s.serialize(*this);
-    s.saveToFile(fileName);
+    std::abort();
 }
 
 void DataTable::load(const std::string &fileName)
 {
-    Serializer s(fileName);
-    s.deserialize(*this);
+    std::abort();
 }
 
 /*

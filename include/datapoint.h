@@ -40,7 +40,6 @@ private:
     double y;
     void setData(const std::vector<double> &x, double y);
 
-    friend class Serializer;
 };
 
 // Measure distance between two points

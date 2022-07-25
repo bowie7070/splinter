@@ -149,7 +149,6 @@ private:
 
     void load(const std::string &fileName) final;
 
-    friend class Serializer;
     friend bool operator==(const BSpline &lhs, const BSpline &rhs);
 };
 

@@ -100,7 +100,6 @@ public:
 protected:
     unsigned int numVariables; // Dimension of domain (size of x)
 
-    friend class Serializer;
 };
 
 } // namespace SPLINTER

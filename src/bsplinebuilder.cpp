@@ -11,7 +11,6 @@
 #include "mykroneckerproduct.h"
 #include "unsupported/Eigen/KroneckerProduct"
 #include <linearsolvers.h>
-#include <serializer.h>
 #include <iostream>
 #include <utilities.h>
 

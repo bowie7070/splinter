@@ -12,7 +12,6 @@
 #include "mykroneckerproduct.h"
 #include "unsupported/Eigen/KroneckerProduct"
 #include <linearsolvers.h>
-#include <serializer.h>
 #include <iostream>
 #include <utilities.h>
 
@@ -396,15 +395,12 @@ bool BSpline::removeUnsupportedBasisFunctions(std::vector<double> &lb, std::vect
 
 void BSpline::save(const std::string &fileName) const
 {
-    Serializer s;
-    s.serialize(*this);
-    s.saveToFile(fileName);
+    std::abort();
 }
 
 void BSpline::load(const std::string &fileName)
 {
-    Serializer s(fileName);
-    s.deserialize(*this);
+    std::abort();
 }
 
 std::string BSpline::getDescription() const

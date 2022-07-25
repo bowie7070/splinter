@@ -12,5 +12,4 @@
 #include "linearsolvers.h"
 #include "mykroneckerproduct.h"
 #include "saveable.h"
-#include "serializer.h"
 #include "utilities.h"
