@@ -8,8 +8,6 @@
 */
 
 #include "bsplinebasis.h"
-#include "mykroneckerproduct.h"
-#include "unsupported/Eigen/KroneckerProduct"
 #include <iostream>
 
 namespace SPLINTER {
@@ -36,16 +34,6 @@ BSplineBasis::BSplineBasis(
                 (basisDegrees.at(i) + 1) + 1); // Minimum degree+1
         }
     }
-}
-
-SparseVector BSplineBasis::eval(DenseVector const& x) const {
-    // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
-    std::vector<SparseVector> basisFunctionValues;
-
-    for (int var = 0; var < x.size(); var++)
-        basisFunctionValues.push_back(bases.at(var).eval(x(var)));
-
-    return kroneckerProductVectors(basisFunctionValues);
 }
 
 // Old implementation of Jacobian
