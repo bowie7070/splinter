@@ -172,16 +172,26 @@ private:
             numBlkRows.push_back(prod);
         }
 
-        // Resize and initialize D
-        matrix D(numRows, numCols);
-        D.reserve(DenseVector::Constant(numCols,2*numVariables));   // D has no more than two elems per col per dim
+
+        std::vector<Eigen::Triplet<double>> coefficients;
+        coefficients.reserve(numCols * 2 *numVariables);
 
         int i = 0;                                          // Row index
+
+
         // Loop though each dimension (each dimension has its own block)
         for (unsigned int d = 0; d < numVariables; d++)
         {
             // Calculate left and right products
             int leftProd = 1;
+            auto const insert = [&](int k) {
+                coefficients.emplace_back(i,k, 1);
+                k += leftProd;
+                coefficients.emplace_back(i,k, -2);
+                k += leftProd;
+                coefficients.emplace_back(i,k, 1);
+            };
+
             int rightProd = 1;
             for (unsigned int k = 0; k < d; k++)
             {
@@ -204,11 +214,7 @@ private:
                     if (d == 0)
                     {
                         int k = j*leftProd*dims[d] + l;
-                        D.insert(i,k) = 1;
-                        k += leftProd;
-                        D.insert(i,k) = -2;
-                        k += leftProd;
-                        D.insert(i,k) = 1;
+                        insert(k);
                         i++;
                     }
                     else
@@ -217,11 +223,7 @@ private:
                         for (int n = 0; n < leftProd; n++)
                         {
                             int k = blkBaseCol + l*leftProd + n;
-                            D.insert(i,k) = 1;
-                            k += leftProd;
-                            D.insert(i,k) = -2;
-                            k += leftProd;
-                            D.insert(i,k) = 1;
+                            insert(k);
                             i++;
                         }
                     }
@@ -229,7 +231,9 @@ private:
             }
         }
 
-        D.makeCompressed();
+        // Resize and initialize D
+        matrix D(numRows, numCols);
+        D.setFromTriplets(coefficients.begin(), coefficients.end());
 
         return D;
     }
