@@ -16,6 +16,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 find_package(Catch2 CONFIG)
+#find_package(Eigen3 CONFIG REQUIRED HINTS path-to-eigen)
 find_package(Eigen3 CONFIG REQUIRED)
 
 
