@@ -108,6 +108,8 @@ private:
         return std::vector<unsigned int>(numVariables, degree);
     }
 
+    using matrix = Eigen::SparseMatrix<double, Eigen::RowMajor>;
+
     auto computeBasisFunctionMatrix(const BSpline &bspline) const
     {
         unsigned int numVariables = _data.getNumVariables();
@@ -116,18 +118,13 @@ private:
         // TODO: Reserve nnz per row (degree+1)
         //int nnzPrCol = bspline.basis.supportedPrInterval();
 
-        SparseMatrix A(numSamples, bspline.getNumBasisFunctions());
+        matrix A(numSamples, bspline.getNumBasisFunctions());
         //A.reserve(DenseVector::Constant(numSamples, nnzPrCol)); // TODO: should reserve nnz per row!
 
         int i = 0;
         for (auto it = _data.cbegin(); it != _data.cend(); ++it, ++i)
         {
-            SparseVector basisValues = bspline.evalBasis(it->x);
-
-            for (SparseVector::InnerIterator it2(basisValues); it2; ++it2)
-            {
-                A.insert(i,it2.index()) = it2.value();
-            }
+            A.row(i) = bspline.evalBasis(it->x);
         }
 
         A.makeCompressed();
@@ -176,7 +173,7 @@ private:
         }
 
         // Resize and initialize D
-        SparseMatrix D(numRows, numCols);
+        matrix D(numRows, numCols);
         D.reserve(DenseVector::Constant(numCols,2*numVariables));   // D has no more than two elems per col per dim
 
         int i = 0;                                          // Row index
@@ -267,7 +264,7 @@ private:
             A = B.transpose() *B;
             b = B.transpose() *b;
 
-            auto I = SparseMatrix(A.cols(), A.cols());
+            auto I = matrix(A.cols(), A.cols());
             I.setIdentity();
             A += _alpha*I;
         }
