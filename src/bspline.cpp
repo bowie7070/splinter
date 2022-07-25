@@ -103,17 +103,6 @@ DenseMatrix BSpline::evalHessian(DenseVector x) const {
     return H;
 }
 
-// Evaluation of B-spline basis functions
-SparseVector BSpline::evalBasis(DenseVector x) const {
-#ifndef NDEBUG
-    if (!pointInDomain(x))
-        throw Exception(
-            "BSpline::evalBasis: Evaluation at point outside domain.");
-#endif // NDEBUG
-
-    return basis.eval(x);
-}
-
 SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
 #ifndef NDEBUG
     if (!pointInDomain(x))
