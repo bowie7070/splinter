@@ -235,8 +235,8 @@ private:
     * alpha = regularization parameter.
     */
     DenseVector computeCoefficients(BSpline const& bspline) const {
-        auto const B  = computeBasisFunctionMatrix(bspline);
-        auto A        = B;
+        auto const B = computeBasisFunctionMatrix(bspline);
+        matrix A;
         DenseVector b = getSamplePointValues();
 
         if (_smoothing == Smoothing::IDENTITY) {
@@ -284,6 +284,8 @@ private:
 
             // Compute right-hand side matrices
             b = B.transpose() * b;
+        } else {
+            A = B;
         }
 
         DenseVector x;
