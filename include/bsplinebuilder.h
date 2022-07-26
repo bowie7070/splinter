@@ -122,9 +122,9 @@ private:
         //A.reserve(DenseVector::Constant(numSamples, nnzPrCol)); // TODO: should reserve nnz per row!
 
         int i = 0;
-        for (auto it = _data.cbegin(); it != _data.cend(); ++it, ++i)
+        for (auto const& sample: _data.csamples())
         {
-            A.row(i) = bspline.evalBasis(it->x);
+            A.row(i++) = bspline.evalBasis(sample.x);
         }
 
         A.makeCompressed();
