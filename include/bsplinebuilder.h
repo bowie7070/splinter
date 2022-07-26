@@ -257,7 +257,7 @@ private:
     DenseVector computeCoefficients(const BSpline& bspline) const
     {
         auto const B = computeBasisFunctionMatrix(bspline);
-        auto A = B;
+        matrix A;
         DenseVector b = getSamplePointValues();
 
         if (_smoothing == Smoothing::IDENTITY)
@@ -308,6 +308,8 @@ private:
 
             // Compute right-hand side matrices
             b = B.transpose() * b;
+        } else {
+            A = B;
         }
 
         DenseVector x;
