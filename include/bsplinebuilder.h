@@ -111,15 +111,21 @@ private:
         // TODO: Reserve nnz per row (degree+1)
         //int nnzPrCol = bspline.basis.supportedPrInterval();
 
-        matrix A(numSamples, bspline.getNumBasisFunctions());
-        //A.reserve(DenseVector::Constant(numSamples, nnzPrCol)); // TODO: should reserve nnz per row!
+        std::vector<Eigen::Triplet<double>> coefficients;
 
         int i = 0;
         for (auto const& sample : _data.csamples()) {
-            A.row(i++) = bspline.evalBasis(sample.x);
+            auto row = bspline.evalBasis(sample.x);
+
+            for (decltype(row)::InnerIterator it(row); it; ++it) {
+                coefficients.emplace_back(i, it.index(), it.value());
+            }
+
+            ++i;
         }
 
-        A.makeCompressed();
+        matrix A(numSamples, bspline.getNumBasisFunctions());
+        A.setFromTriplets(coefficients.begin(), coefficients.end());
 
         return A;
     }
