@@ -70,9 +70,8 @@ public:
         addSample(DataPoint(x, y));
     }
 
-    /*
-     * Getters
-     */
+    auto const& csamples() const { return samples; }
+
     auto cbegin() const { return samples.cbegin(); }
 
     auto cend() const { return samples.cend(); }
