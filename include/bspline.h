@@ -133,11 +133,6 @@ private:
     template <class x_type>
     auto evalBasis(x_type const& x) const
     {
-        #ifndef NDEBUG
-        if (!pointInDomain(x))
-            throw Exception("BSpline::evalBasis: Evaluation at point outside domain.");
-        #endif // NDEBUG
-
         return basis.eval(x);
     }
 
