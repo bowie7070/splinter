@@ -45,7 +45,14 @@ public:
         std::vector<std::vector<double>> knotVectors,
         std::vector<unsigned int> basisDegrees);
 
-    double eval(DenseVector x) const;
+    template <class x_type>
+    double eval(x_type const& x) const {
+        checkInput(x);
+        // NOTE: casting to DenseVector to allow accessing as res(0)
+        DenseVector res = coefficients.transpose() * evalBasis(x);
+        return res(0);
+    }
+
     DenseMatrix evalJacobian(DenseVector x) const;
     DenseMatrix evalHessian(DenseVector x) const;
 
@@ -54,12 +61,12 @@ public:
         assert(x.size() == numVariables);
     }
 
-    double operator()(DenseVector const& x) const { return eval(x); }
-    double operator()(double const x0) const {
-        DenseVector x(1);
-        x[0] = x0;
+    template <class x_type>
+    double operator()(x_type const& x) const {
         return eval(x);
     }
+
+    double operator()(double const x0) const { return eval(std::array{x0}); }
 
     /**
      * Getters

@@ -57,16 +57,6 @@ BSpline::BSpline(
 }
 
 /**
- * Returns the function value at x
- */
-double BSpline::eval(DenseVector x) const {
-    checkInput(x);
-    // NOTE: casting to DenseVector to allow accessing as res(0)
-    DenseVector res = coefficients.transpose() * evalBasis(x);
-    return res(0);
-}
-
-/**
  * Returns the (1 x numVariables) Jacobian evaluated at x
  */
 DenseMatrix BSpline::evalJacobian(DenseVector x) const {
