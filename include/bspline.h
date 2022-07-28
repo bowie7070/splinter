@@ -19,7 +19,7 @@ namespace SPLINTER
 /**
  * Class that implements the multivariate tensor product B-spline
  */
-class SPLINTER_API BSpline final : private Function
+class SPLINTER_API BSpline 
 {
 public:
     /**
@@ -39,14 +39,14 @@ public:
     BSpline(std::vector<double> coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
     BSpline(DenseVector coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
 
-    using Function::getNumVariables;
-    using Function::centralDifference;
+    double eval(DenseVector x) const;
+    DenseMatrix evalJacobian(DenseVector x) const;
+    DenseMatrix evalHessian(DenseVector x) const;
 
-    virtual BSpline* clone() const { return new BSpline(*this); }
- 
-    double eval(DenseVector x) const final;
-    DenseMatrix evalJacobian(DenseVector x) const final;
-    DenseMatrix evalHessian(DenseVector x) const final;
+    template <class x_type>
+    void checkInput(x_type const& x) const {
+        assert(x.size() == numVariables);
+    }
 
     double operator()(DenseVector const& x) const { return eval(x); }
     double operator()(double const x0) const { 
@@ -112,11 +112,22 @@ public:
     // Insert a knot until desired knot multiplicity is obtained
     void insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
-    std::string getDescription() const final;
+    std::string getDescription() const;
 
-protected:
+    inline unsigned int getNumVariables() const
+    {
+        return numVariables;
+    }
+
+    auto centralDifference(DenseVector const& x) const
+    {
+        return SPLINTER::centralDifference(*this, x);
+    }
+
+
+private:
     BSpline();
-
+    unsigned int numVariables; // Dimension of domain (size of x)
     BSplineBasis basis;
 
     /*
@@ -129,7 +140,6 @@ protected:
     // Control point computations
     DenseMatrix computeKnotAverages() const;
 
-private:
     // Evaluation of B-spline basis functions
     template <class x_type>
     auto evalBasis(x_type const& x) const

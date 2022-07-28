@@ -15,6 +15,35 @@
 namespace SPLINTER
 {
 
+template <class callable>
+auto centralDifference(callable const& f, DenseVector const& x)
+{
+    auto const I = x.size();
+
+    DenseVector dx(I);
+
+    double h = 1e-6; // perturbation step size
+    double hForward = 0.5*h;
+    double hBackward = 0.5*h;
+
+    for (unsigned int i = 0; i < I; ++i)
+    {
+        DenseVector xForward(x);
+        xForward(i) = xForward(i) + hForward;
+
+        DenseVector xBackward(x);
+        xBackward(i) = xBackward(i) - hBackward;
+
+        // todo: use function operator
+        double yForward = f.eval(xForward);
+        double yBackward = f.eval(xBackward);
+
+        dx[i] = (yForward - yBackward)/(hBackward + hForward);
+    }
+
+    return dx;
+}
+
 /*
  * Interface for functions
  * All functions working with standard C++11 types are defined in terms of their Eigen counterparts.
@@ -77,12 +106,16 @@ public:
             throw Exception("Function::checkInput: Wrong dimension on evaluation point x.");
     }
 
+
     /**
      * Returns the central difference at x
      * Vector of numVariables length
      */
     std::vector<double> centralDifference(const std::vector<double> &x) const;
-    DenseMatrix centralDifference(DenseVector x) const;
+    DenseMatrix centralDifference(DenseVector x) const
+    {
+        return SPLINTER::centralDifference(*this, x);
+    }
 
     std::vector<std::vector<double>> secondOrderCentralDifference(const std::vector<double> &x) const;
     DenseMatrix secondOrderCentralDifference(DenseVector x) const;
