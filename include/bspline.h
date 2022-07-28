@@ -18,7 +18,7 @@ namespace SPLINTER {
 /**
  * Class that implements the multivariate tensor product B-spline
  */
-class SPLINTER_API BSpline final : private Function {
+class SPLINTER_API BSpline {
 public:
     /**
      * Builder class for construction by regression
@@ -45,14 +45,14 @@ public:
         std::vector<std::vector<double>> knotVectors,
         std::vector<unsigned int> basisDegrees);
 
-    using Function::centralDifference;
-    using Function::getNumVariables;
+    double eval(DenseVector x) const;
+    DenseMatrix evalJacobian(DenseVector x) const;
+    DenseMatrix evalHessian(DenseVector x) const;
 
-    virtual BSpline* clone() const { return new BSpline(*this); }
-
-    double eval(DenseVector x) const final;
-    DenseMatrix evalJacobian(DenseVector x) const final;
-    DenseMatrix evalHessian(DenseVector x) const final;
+    template <class x_type>
+    void checkInput(x_type const& x) const {
+        assert(x.size() == numVariables);
+    }
 
     double operator()(DenseVector const& x) const { return eval(x); }
     double operator()(double const x0) const {
@@ -111,11 +111,17 @@ public:
     void
     insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
-    std::string getDescription() const final;
+    std::string getDescription() const;
 
-protected:
+    inline unsigned int getNumVariables() const { return numVariables; }
+
+    auto centralDifference(DenseVector const& x) const {
+        return SPLINTER::centralDifference(*this, x);
+    }
+
+private:
     BSpline();
-
+    unsigned int numVariables; // Dimension of domain (size of x)
     BSplineBasis basis;
 
     /*
@@ -128,7 +134,6 @@ protected:
     // Control point computations
     DenseMatrix computeKnotAverages() const;
 
-private:
     // Evaluation of B-spline basis functions
     template <class x_type>
     auto evalBasis(x_type const& x) const {

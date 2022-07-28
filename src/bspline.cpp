@@ -17,9 +17,9 @@
 
 namespace SPLINTER {
 
-BSpline::BSpline() : Function(1) {}
+BSpline::BSpline() : numVariables(1) {}
 
-BSpline::BSpline(unsigned int numVariables) : Function(numVariables) {}
+BSpline::BSpline(unsigned int numVariables) : numVariables(numVariables) {}
 
 /*
  * Constructors for multivariate B-spline using explicit data
@@ -27,7 +27,7 @@ BSpline::BSpline(unsigned int numVariables) : Function(numVariables) {}
 BSpline::BSpline(
     std::vector<std::vector<double>> knotVectors,
     std::vector<unsigned int> basisDegrees) :
-    Function(knotVectors.size()),
+    numVariables(knotVectors.size()),
     basis(BSplineBasis(knotVectors, basisDegrees)),
     coefficients(DenseVector::Zero(1)),
     knotaverages(computeKnotAverages()) {
@@ -47,7 +47,7 @@ BSpline::BSpline(
     DenseVector coefficients,
     std::vector<std::vector<double>> knotVectors,
     std::vector<unsigned int> basisDegrees) :
-    Function(knotVectors.size()),
+    numVariables(knotVectors.size()),
     basis(BSplineBasis(knotVectors, basisDegrees)),
     coefficients(coefficients),
     knotaverages(computeKnotAverages()) {
