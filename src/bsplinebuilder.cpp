@@ -46,8 +46,8 @@ namespace SPLINTER {
 * almost all knots will lie close to the left samples. Try a bucket approach, where the
 * samples are added to buckets and the knots computed as the average of these.
 */
-std::vector<double> BSpline::Builder::knotVectorMovingAverage(
-    std::vector<double> const& values, unsigned int degree) const {
+std::vector<double> knotVectorMovingAverage(
+    std::vector<double> const& values, unsigned int degree) {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
 
@@ -92,10 +92,10 @@ std::vector<double> BSpline::Builder::knotVectorMovingAverage(
     return knots;
 }
 
-std::vector<double> BSpline::Builder::knotVectorEquidistant(
+std::vector<double> knotVectorEquidistant(
     std::vector<double> const& values,
     unsigned int degree,
-    unsigned int numBasisFunctions = 0) const {
+    unsigned int numBasisFunctions = 0) {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
 
@@ -136,10 +136,10 @@ std::vector<double> BSpline::Builder::knotVectorEquidistant(
     return knots;
 }
 
-std::vector<double> BSpline::Builder::knotVectorBuckets(
+std::vector<double> knotVectorBuckets(
     std::vector<double> const& values,
     unsigned int degree,
-    unsigned int maxSegments) const {
+    unsigned int maxSegments) {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
 
@@ -213,8 +213,7 @@ std::vector<double> BSpline::Builder::knotVectorBuckets(
     return knots;
 }
 
-std::vector<double>
-BSpline::Builder::extractUniqueSorted(std::vector<double> const& values) const {
+std::vector<double> extractUniqueSorted(std::vector<double> const& values) {
     // Sort and remove duplicates
     std::vector<double> unique(values);
     std::sort(unique.begin(), unique.end());

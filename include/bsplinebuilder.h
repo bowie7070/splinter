@@ -34,6 +34,20 @@ enum class BSpline::KnotSpacing {
     EXPERIMENTAL // Experimental knot spacing (for testing purposes).
 };
 
+std::vector<double>
+knotVectorMovingAverage(std::vector<double> const& values, unsigned int degree);
+std::vector<double> knotVectorEquidistant(
+    std::vector<double> const& values,
+    unsigned int degree,
+    unsigned int numBasisFunctions);
+std::vector<double> knotVectorBuckets(
+    std::vector<double> const& values,
+    unsigned int degree,
+    unsigned int maxSegments = 10);
+
+// Auxiliary
+std::vector<double> extractUniqueSorted(std::vector<double> const& values);
+
 // B-spline builder class
 class SPLINTER_API BSpline::Builder {
 public:
@@ -396,21 +410,6 @@ private:
             return knotVectorMovingAverage(values, degree);
         }
     }
-
-    std::vector<double> knotVectorMovingAverage(
-        std::vector<double> const& values, unsigned int degree) const;
-    std::vector<double> knotVectorEquidistant(
-        std::vector<double> const& values,
-        unsigned int degree,
-        unsigned int numBasisFunctions) const;
-    std::vector<double> knotVectorBuckets(
-        std::vector<double> const& values,
-        unsigned int degree,
-        unsigned int maxSegments = 10) const;
-
-    // Auxiliary
-    std::vector<double>
-    extractUniqueSorted(std::vector<double> const& values) const;
 
     // Member variables
     DataTable _data;
