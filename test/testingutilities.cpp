@@ -225,25 +225,6 @@ bool compareFunctions(
         inf_norm_epsilon);
 }
 
-bool compareFunctions(const Function& f1, const Function& f2) {
-    int dim        = f1.getNumVariables();
-    auto start     = std::vector<double>(dim);
-    auto end       = std::vector<double>(dim);
-    auto numPoints = std::vector<unsigned int>(dim);
-
-    // Try to avoid testing at "nice" values,
-    // as that is likely where the function was sampled.
-    for (int i = 0; i < dim; i++) {
-        start.at(i)     = -10.0;
-        end.at(i)       = 10.0;
-        numPoints.at(i) = 10;
-    }
-
-    auto points = linspace(start, end, numPoints);
-
-    return compareFunctions(f1, f2, points);
-}
-
 void compareFunctionValue(std::vector<TestFunction *> funcs,
                           std::function<Function *(const DataTable &table)> approx_gen_func,
                           size_t numSamplePoints, size_t numEvalPoints,
