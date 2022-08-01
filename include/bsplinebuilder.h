@@ -42,7 +42,15 @@ enum class BSpline::KnotSpacing
 class SPLINTER_API BSpline::Builder
 {
 public:
-    Builder(const DataTable &data);
+    Builder(const DataTable &data) :
+        _data(data),
+        _degrees(getBSplineDegrees(data.getNumVariables(), 3)),
+        _numBasisFunctions(std::vector<unsigned int>(data.getNumVariables(), 0)),
+        _knotSpacing(KnotSpacing::AS_SAMPLED),
+        _smoothing(Smoothing::NONE),
+        _alpha(0.1)
+    {
+    }
 
     Builder& alpha(double alpha)
     {
@@ -96,10 +104,25 @@ public:
     }
 
     // Build B-spline
-    BSpline build() const;
+    BSpline build() const
+    {
+        // Check data
+        // TODO: Remove this test
+        if (!_data.isGridComplete())
+            throw Exception("BSpline::Builder::build: Cannot create B-spline from irregular (incomplete) grid.");
+
+        // Build knot vectors
+        // Build B-spline (with default coefficients)
+        auto bspline = BSpline(computeKnotVectors(), _degrees);
+
+        // Compute coefficients from samples and update B-spline
+        auto coefficients = computeCoefficients(bspline);
+        bspline.setCoefficients(coefficients);
+
+        return bspline;
+    }
 
 private:
-    Builder();
 
     std::vector<unsigned int> getBSplineDegrees(unsigned int numVariables, unsigned int degree)
     {
@@ -351,11 +374,51 @@ private:
 
     // Control point computations
     DenseVector computeBSplineCoefficients(const BSpline &bspline) const;
-    DenseVector getSamplePointValues() const;
+    DenseVector getSamplePointValues() const
+    {
+        DenseVector B(_data.getNumSamples());
+
+        int i = 0;
+        for (auto it = _data.cbegin(); it != _data.cend(); ++it, ++i)
+            B(i) = it->y;
+
+        return B;
+    }
 
     // Computing knots
-    std::vector<std::vector<double>> computeKnotVectors() const;
-    std::vector<double> computeKnotVector(const std::vector<double> &values, unsigned int degree, unsigned int numBasisFunctions) const;
+    std::vector<std::vector<double>> computeKnotVectors() const
+    {
+        if (_data.getNumVariables() != _degrees.size())
+            throw Exception("BSpline::Builder::computeKnotVectors: Inconsistent sizes on input vectors.");
+
+        std::vector<std::vector<double>> grid = _data.getTableX();
+
+        std::vector<std::vector<double>> knotVectors;
+
+        for (unsigned int i = 0; i < _data.getNumVariables(); ++i)
+        {
+            // Compute knot vector
+            knotVectors.push_back(computeKnotVector(grid.at(i), _degrees.at(i), _numBasisFunctions.at(i)));
+        }
+
+        return knotVectors;
+    }
+
+    std::vector<double> computeKnotVector(const std::vector<double> &values, unsigned int degree, unsigned int numBasisFunctions) const
+    {
+        switch (_knotSpacing)
+        {
+        case KnotSpacing::AS_SAMPLED:
+            return knotVectorMovingAverage(values, degree);
+        case KnotSpacing::EQUIDISTANT:
+            return knotVectorEquidistant(values, degree, numBasisFunctions);
+        case KnotSpacing::EXPERIMENTAL:
+            return knotVectorBuckets(values, degree);
+        default:
+            return knotVectorMovingAverage(values, degree);
+        }
+    }
+
     std::vector<double> knotVectorMovingAverage(const std::vector<double> &values, unsigned int degree) const;
     std::vector<double> knotVectorEquidistant(const std::vector<double> &values, unsigned int degree, unsigned int numBasisFunctions) const;
     std::vector<double> knotVectorBuckets(const std::vector<double> &values, unsigned int degree, unsigned int maxSegments = 10) const;
