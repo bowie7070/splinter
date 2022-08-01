@@ -49,8 +49,22 @@ std::vector<std::vector<double>> linspace(int dim);
 
 std::vector<std::vector<double>> linspace(int dim, unsigned int pointsPerDim);
 
-DataTable sample(const Function &func, std::vector<std::vector<double>> &points);
-DataTable sample(const Function *func, std::vector<std::vector<double>> &points);
+inline auto sample(const Function& func, std::vector<std::vector<double>>& points) {
+    DataTable table;
+
+    for (auto& x : points) {
+        table.addSample(x, func.eval(x));
+    }
+
+    return table;
+
+}
+
+inline auto sample(const Function* func, std::vector<std::vector<double>>& points)
+{
+    return sample(*func, points);
+}
+
 
 enum class TestType {
     All,
@@ -105,7 +119,7 @@ void compareFunctionValue(TestFunction *exact,
     auto samplePoints = linspace(dim, -5, 5, std::pow(numSamplePoints, 1.0 / dim));
     auto evalPoints = linspace(dim, -5, 5, std::pow(numEvalPoints, 1.0 / dim));
 
-    DataTable table = sample(exact, samplePoints);
+    auto table = sample(exact, samplePoints);
 
     auto approx{ approx_gen_func(table) };
     static_assert(is_unique_ptr_v<decltype(approx)>);
@@ -202,7 +216,7 @@ void compareJacobianValue(TestFunction *exact,
     auto samplePoints = linspace(dim, -5, 5, std::pow(numSamplePoints, 1.0 / dim));
     auto evalPoints = linspace(dim, -4.95, 4.95, std::pow(numEvalPoints, 1.0 / dim));
 
-    DataTable table = sample(exact, samplePoints);
+    auto table = sample(exact, samplePoints);
 
     auto approx{ approx_gen_func(table) };
     static_assert(is_unique_ptr_v<decltype(approx)>);
@@ -325,7 +339,7 @@ void checkHessianSymmetry(TestFunction *exact,
     auto samplePoints = linspace(dim, -5, 5, std::pow(numSamplePoints, 1.0 / dim));
     auto evalPoints = linspace(dim, -4.95, 4.95, std::pow(numEvalPoints, 1.0 / dim));
 
-    DataTable table = sample(exact, samplePoints);
+    auto table = sample(exact, samplePoints);
 
     auto approx{ approx_gen_func(table) };
     static_assert(is_unique_ptr_v<decltype(approx)>);

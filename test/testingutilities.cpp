@@ -270,24 +270,6 @@ bool compareBSplines(const BSpline &left, const BSpline &right)
 }
 
 
-DataTable sample(const Function &func, std::vector<std::vector<double>> &points) {
-    return sample(&func, points);
-}
-
-DataTable sample(const Function *func, std::vector<std::vector<double>> &points)
-{
-    DataTable table;
-
-    for(auto &point : points) {
-        DenseVector x = vecToDense(point);
-        table.addSample(point, func->eval(x));
-    }
-
-    return table;
-}
-
-
-
 double sixHumpCamelBack(DenseVector x)
 {
     assert(x.rows() == 2);
