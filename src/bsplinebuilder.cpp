@@ -47,8 +47,8 @@ namespace SPLINTER
 * almost all knots will lie close to the left samples. Try a bucket approach, where the
 * samples are added to buckets and the knots computed as the average of these.
 */
-std::vector<double> BSpline::Builder::knotVectorMovingAverage(const std::vector<double> &values,
-                                                              unsigned int degree) const
+std::vector<double> knotVectorMovingAverage(const std::vector<double> &values,
+                                                              unsigned int degree) 
 {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
@@ -94,9 +94,9 @@ std::vector<double> BSpline::Builder::knotVectorMovingAverage(const std::vector<
     return knots;
 }
 
-std::vector<double> BSpline::Builder::knotVectorEquidistant(const std::vector<double> &values,
+std::vector<double> knotVectorEquidistant(const std::vector<double> &values,
                                                             unsigned int degree,
-                                                            unsigned int numBasisFunctions = 0) const
+                                                            unsigned int numBasisFunctions = 0)
 {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
@@ -136,7 +136,7 @@ std::vector<double> BSpline::Builder::knotVectorEquidistant(const std::vector<do
     return knots;
 }
 
-std::vector<double> BSpline::Builder::knotVectorBuckets(const std::vector<double> &values, unsigned int degree, unsigned int maxSegments) const
+std::vector<double> knotVectorBuckets(const std::vector<double> &values, unsigned int degree, unsigned int maxSegments)
 {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
@@ -212,7 +212,7 @@ std::vector<double> BSpline::Builder::knotVectorBuckets(const std::vector<double
     return knots;
 }
 
-std::vector<double> BSpline::Builder::extractUniqueSorted(const std::vector<double> &values) const
+std::vector<double> extractUniqueSorted(const std::vector<double> &values)
 {
     // Sort and remove duplicates
     std::vector<double> unique(values);
