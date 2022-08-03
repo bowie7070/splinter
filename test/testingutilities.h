@@ -14,7 +14,6 @@
 #include <function.h>
 #include "definitions.h"
 #include <bspline.h>
-#include <operatoroverloads.h>
 #include <testfunction.h>
 #include <iostream>
 #include <iomanip>

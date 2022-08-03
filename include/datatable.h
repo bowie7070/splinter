@@ -167,8 +167,6 @@ private:
                 "DataTable::gridCompleteGuard: The grid is not complete yet!");
         }
     }
-
-    friend bool operator==(DataTable const& lhs, DataTable const& rhs);
 };
 
 } // namespace SPLINTER

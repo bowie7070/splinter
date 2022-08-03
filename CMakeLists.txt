@@ -62,10 +62,7 @@ if(Catch2_FOUND)
         test/bsplinetestingutilities.h
         test/general/bspline.cpp
         test/general/datatable.cpp
-        test/general/utilities.cpp
         test/main.cpp
-        test/operatoroverloads.cpp
-        test/operatoroverloads.h
         test/testfunction.cpp
         test/testfunction.h
         test/testfunctions.cpp
