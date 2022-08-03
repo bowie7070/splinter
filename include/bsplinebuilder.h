@@ -334,12 +334,6 @@ private:
         bool solveAsDense   = (numEquations < maxNumEquations);
 
         if (!solveAsDense) {
-#ifndef NDEBUG
-            std::cout
-                << "BSpline::Builder::computeBSplineCoefficients: Computing B-spline control points using sparse solver."
-                << std::endl;
-#endif // NDEBUG
-
             SparseLU<> s;
             //bool successfulSolve = (s.solve(A,Bx,Cx) && s.solve(A,By,Cy));
 
@@ -347,12 +341,6 @@ private:
         }
 
         if (solveAsDense) {
-#ifndef NDEBUG
-            std::cout
-                << "BSpline::Builder::computeBSplineCoefficients: Computing B-spline control points using dense solver."
-                << std::endl;
-#endif // NDEBUG
-
             DenseMatrix Ad = A.toDense();
             DenseQR<DenseVector> s;
             // DenseSVD<DenseVector> s;
