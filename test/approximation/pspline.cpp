@@ -28,7 +28,7 @@ TEST_CASE("PSpline function" COMMON_TEXT, COMMON_TAGS "[function-value]")
         double inf_eps = 0.1;
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table)
                                          .smoothing(BSpline::Smoothing::PSPLINE)
@@ -51,7 +51,7 @@ TEST_CASE("PSpline jacobian" COMMON_TEXT, COMMON_TAGS "[jacobian]")
         double inf_eps = 6e-5;
 
         compareJacobianValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table)
                                          .smoothing(BSpline::Smoothing::PSPLINE)
@@ -70,7 +70,7 @@ TEST_CASE("PSpline hessian" COMMON_TEXT, COMMON_TAGS "[hessian]")
     for (auto testFunc : getPolynomialFunctions())
     {
         checkHessianSymmetry(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table)
                                          .smoothing(BSpline::Smoothing::PSPLINE)

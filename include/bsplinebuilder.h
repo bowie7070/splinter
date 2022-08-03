@@ -49,9 +49,10 @@ std::vector<double> knotVectorBuckets(
 std::vector<double> extractUniqueSorted(std::vector<double> const& values);
 
 // B-spline builder class
+template <class data_table>
 class SPLINTER_API BSpline::Builder {
 public:
-    Builder(DataTable const& data) :
+    Builder(data_table const& data) :
         _data(data),
         _degrees(getBSplineDegrees(data.getNumVariables(), 3)),
         _numBasisFunctions(
@@ -152,7 +153,10 @@ private:
         for (auto const& sample : _data.csamples()) {
             auto row = bspline.evalBasis(sample.x);
 
-            for (decltype(row)::InnerIterator it(row); it; ++it) {
+            using row_type = decltype(row);
+            using iterator = typename row_type::InnerIterator;
+
+            for (iterator it(row); it; ++it) {
                 coefficients.emplace_back(i, it.index(), it.value());
             }
 
@@ -412,7 +416,7 @@ private:
     }
 
     // Member variables
-    DataTable _data;
+    data_table _data;
     std::vector<unsigned int> _degrees;
     std::vector<unsigned int> _numBasisFunctions;
     KnotSpacing _knotSpacing;

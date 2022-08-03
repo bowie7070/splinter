@@ -610,7 +610,7 @@ void _checkNorm(DenseMatrix normValues, int row, size_t numPoints, double one_ep
 
 // Must use std::function because a capturing alpha cannot be converted to a function pointer
 void testApproximation(std::vector<TestFunction *> funcs,
-                       std::function<Function *(const DataTable &table)> approx_gen_func,
+                       std::function<Function *(const _data_table<>&table)> approx_gen_func,
                        TestType type, size_t numSamplePoints, size_t numEvalPoints,
                        double one_eps, double two_eps, double inf_eps)
 {
@@ -622,7 +622,7 @@ void testApproximation(std::vector<TestFunction *> funcs,
             auto samplePoints = linspace(dim, -5, 5, std::pow(numSamplePoints, 1.0/dim));
             auto evalPoints = linspace(dim, -4.95, 4.95, std::pow(numEvalPoints, 1.0/dim));
 
-            DataTable table = sample(exact, samplePoints);
+            auto table = sample(exact, samplePoints);
 
             Function *approx = approx_gen_func(table);
 

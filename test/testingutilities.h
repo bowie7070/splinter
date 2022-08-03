@@ -49,7 +49,7 @@ std::vector<std::vector<double>> linspace(int dim);
 std::vector<std::vector<double>> linspace(int dim, unsigned int pointsPerDim);
 
 inline auto sample(const Function& func, std::vector<std::vector<double>>& points) {
-    DataTable table;
+    _data_table<> table;
 
     for (auto& x : points) {
         table.addSample(x, func.eval(x));
@@ -408,7 +408,7 @@ void checkNorm(DenseMatrix normValues, TestType type, size_t numPoints, double o
 void _checkNorm(DenseMatrix normValues, int row, size_t numPoints, double one_eps, double two_eps, double inf_eps);
 
 void testApproximation(std::vector<TestFunction *> funcs,
-                       std::function<Function *(const DataTable &table)> approx_gen_func,
+                       std::function<Function *(const _data_table<>&table)> approx_gen_func,
                        TestType type, size_t numSamplePoints, size_t numEvalPoints,
                        double one_eps, double two_eps, double inf_eps);
 
