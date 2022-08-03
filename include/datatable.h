@@ -104,10 +104,8 @@ public:
         // Fill table with values
         int i = 0;
         for (auto& sample : samples) {
-            std::vector<double> x = sample.x;
-
             for (unsigned int j = 0; j < numVariables; j++) {
-                table[j][i] = x[j];
+                table[j][i] = sample.x[j];
             }
             i++;
         }
@@ -156,7 +154,7 @@ private:
         return (i > 0 ? samplesRequired : (unsigned long)0);
     }
 
-    void recordGridPoint(DataPoint const& sample) {
+    void recordGridPoint(data_point const& sample) {
         for (unsigned int i = 0; i < getNumVariables(); i++) {
             grid[i].insert(sample.x[i]);
         }
@@ -171,6 +169,11 @@ private:
         }
     }
 };
+
+template <class x_type>
+using data_table_x = _data_table<std::multiset<_data_point<x_type>>>;
+
+using DataTable = _data_table<>;
 
 } // namespace SPLINTER
 
