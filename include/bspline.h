@@ -26,6 +26,7 @@ public:
      * Builder class for construction by regression
      * Implemented in BSplineBuilder.*
      */
+    template <class data_table>
     class Builder;
     enum class Smoothing;
     enum class KnotSpacing;

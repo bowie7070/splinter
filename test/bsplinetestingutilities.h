@@ -16,7 +16,7 @@
 namespace SPLINTER
 {
 
-DataTable sampleTestFunction();
+_data_table<> sampleTestFunction();
 
 /*
  * Test knot insertion

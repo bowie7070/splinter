@@ -38,7 +38,7 @@ TEST_CASE("Linear BSpline function" COMMON_TEXT " densely sampled", COMMON_TAGS 
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
                                  return std::make_unique<BSpline>(bs);
@@ -69,7 +69,7 @@ TEST_CASE("Linear BSpline function" COMMON_TEXT " sampled with medium density", 
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
                                  return std::make_unique<BSpline>(bs);
@@ -100,7 +100,7 @@ TEST_CASE("Linear BSpline function" COMMON_TEXT " sparsely sampled", COMMON_TAGS
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
                                  return std::make_unique<BSpline>(bs);
@@ -121,7 +121,7 @@ TEST_CASE("Linear BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::line
     for (auto testFunc : getPolynomialFunctions())
     {
         compareJacobianValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
                                  return std::make_unique<BSpline>(bs);
@@ -137,7 +137,7 @@ TEST_CASE("Linear BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::linea
     for (auto testFunc : getPolynomialFunctions())
     {
         checkHessianSymmetry(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
                                  return std::make_unique<BSpline>(bs);
@@ -167,7 +167,7 @@ TEST_CASE("Quadratic BSpline function" COMMON_TEXT " densely sampled", COMMON_TA
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
                                  return std::make_unique<BSpline>(bs);
@@ -197,7 +197,7 @@ TEST_CASE("Quadratic BSpline function" COMMON_TEXT " sampled with normal density
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
                                  return std::make_unique<BSpline>(bs);
@@ -227,7 +227,7 @@ TEST_CASE("Quadratic BSpline function" COMMON_TEXT " sparsely sampled", COMMON_T
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
                                  return std::make_unique<BSpline>(bs);
@@ -247,7 +247,7 @@ TEST_CASE("Quadratic BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::q
     for (auto testFunc : getPolynomialFunctions())
     {
         compareJacobianValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
                                  return std::make_unique<BSpline>(bs);
@@ -263,7 +263,7 @@ TEST_CASE("Quadratic BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::qu
     for (auto testFunc : getPolynomialFunctions())
     {
         checkHessianSymmetry(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
                                  return std::make_unique<BSpline>(bs);
@@ -293,7 +293,7 @@ TEST_CASE("Cubic BSpline function" COMMON_TEXT " densely sampled", COMMON_TAGS "
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
                                  return std::make_unique<BSpline>(bs);
@@ -323,7 +323,7 @@ TEST_CASE("Cubic BSpline function" COMMON_TEXT " sampled with normal density", C
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
                                  return std::make_unique<BSpline>(bs);
@@ -353,7 +353,7 @@ TEST_CASE("Cubic BSpline function" COMMON_TEXT " sparsely sampled", COMMON_TAGS 
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
                                  return std::make_unique<BSpline>(bs);
@@ -373,7 +373,7 @@ TEST_CASE("Cubic BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::cubic
     for (auto testFunc : getPolynomialFunctions())
     {
         compareJacobianValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
                                  return std::make_unique<BSpline>(bs);
@@ -389,7 +389,7 @@ TEST_CASE("Cubic BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::cubic]
     for (auto testFunc : getPolynomialFunctions())
     {
         checkHessianSymmetry(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
                                  return std::make_unique<BSpline>(bs);
@@ -419,7 +419,7 @@ TEST_CASE("Quartic BSpline function" COMMON_TEXT " densely sampled", COMMON_TAGS
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
                                  return std::make_unique<BSpline>(bs);
@@ -449,7 +449,7 @@ TEST_CASE("Quartic BSpline function" COMMON_TEXT " sampled with normal density",
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
                                  return std::make_unique<BSpline>(bs);
@@ -479,7 +479,7 @@ TEST_CASE("Quartic BSpline function" COMMON_TEXT " sparsely sampled", COMMON_TAG
         }
 
         compareFunctionValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
                                  return std::make_unique<BSpline>(bs);
@@ -499,7 +499,7 @@ TEST_CASE("Quartic BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::qua
     for (auto testFunc : getPolynomialFunctions())
     {
         compareJacobianValue(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
                                  return std::make_unique<BSpline>(bs);
@@ -515,7 +515,7 @@ TEST_CASE("Quartic BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::quar
     for (auto testFunc : getPolynomialFunctions())
     {
         checkHessianSymmetry(testFunc,
-                             [](const DataTable &table)
+                             [](const auto &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
                                  return std::make_unique<BSpline>(bs);

@@ -14,9 +14,9 @@
 namespace SPLINTER
 {
 
-DataTable sampleTestFunction()
+_data_table<> sampleTestFunction()
 {
-    DataTable samples;
+    _data_table<> samples;
 
     // Sample function
     auto x0_vec = linspace(0,2,20);
@@ -43,7 +43,7 @@ DataTable sampleTestFunction()
 
 bool testKnotInsertion()
 {
-    DataTable samples = sampleTestFunction();
+    auto samples = sampleTestFunction();
 
     // Build B-splines that interpolate the samples
     BSpline bspline1 = BSpline::Builder(samples).degree(1).build();
@@ -143,7 +143,7 @@ bool domainReductionTest(BSpline &bs, const BSpline &bs_orig)
 bool runRecursiveDomainReductionTest()
 {
     // Create new DataTable to manage samples
-    DataTable samples = sampleTestFunction();
+    auto samples = sampleTestFunction();
 
     // Build B-splines that interpolate the samples
     BSpline bspline1 = BSpline::Builder(samples).degree(1).build();

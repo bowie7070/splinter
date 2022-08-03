@@ -22,10 +22,12 @@ namespace SPLINTER
  * DataTable is a class for storing multidimensional data samples (x,y).
  * The samples are stored in a continuously sorted table.
  */
-class SPLINTER_API DataTable
+
+template <class samples_type = std::multiset<DataPoint>>
+class SPLINTER_API _data_table
 {
 public:
-    DataTable(bool allowDuplicates = false, bool allowIncompleteGrid = false)
+    _data_table(bool allowDuplicates = false, bool allowIncompleteGrid = false)
     : allowDuplicates(allowDuplicates),
       allowIncompleteGrid(allowIncompleteGrid),
       numDuplicates(0),
@@ -33,10 +35,12 @@ public:
     {
     }
 
+    using data_point = typename samples_type::value_type;
+
     /*
      * Functions for adding a sample (x,y)
      */
-    void addSample(const DataPoint &sample)
+    void addSample(const data_point&sample)
     {
         if (getNumSamples() == 0)
         {
@@ -72,7 +76,7 @@ public:
     template <class x_type>
     void addSample(x_type const& x, double y) 
     {
-        addSample(DataPoint(x, y));
+        addSample(data_point(x, y));
     }
 
     auto const& csamples() const { return samples; }
@@ -89,7 +93,7 @@ public:
 
     unsigned int getNumVariables() const {return numVariables;}
     unsigned int getNumSamples() const {return samples.size();}
-    const std::multiset<DataPoint>& getSamples() const {return samples;}
+    const samples_type& getSamples() const {return samples;}
 
     std::vector<std::set<double>> getGrid() const { return grid; }
 
@@ -129,7 +133,7 @@ public:
     std::vector<double> getVectorY() const
     {
         std::vector<double> y;
-        for (std::multiset<DataPoint>::const_iterator it = cbegin(); it != cend(); ++it)
+        for (auto it = cbegin(); it != cend(); ++it)
         {
             y.push_back(it->y);
         }
@@ -148,7 +152,7 @@ private:
     unsigned int numDuplicates;
     unsigned int numVariables;
 
-    std::multiset<DataPoint> samples;
+    samples_type samples;
     std::vector< std::set<double> > grid;
 
     // Initialise grid to be a std::vector of xDim std::sets
