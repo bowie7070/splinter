@@ -16,58 +16,46 @@ namespace SPLINTER
 {
 
 /*
- * DataPoint is a class representing a data point (x, y),
- * where y is the value obtained by sampling at a point x.
- * Note that x is a vector and y is a scalar.
- */
-class DataPoint
+	* DataPoint is a class representing a data point (x, y),
+	* where y is the value obtained by sampling at a point x.
+	* Note that x is a vector and y is a scalar.
+	*/
+
+template <class x_type>
+struct _data_point
 {
-    using x_type = std::vector<double>;
+	_data_point(double x, double y)
+		: x{ x },
+		y(y)
+	{
+	}
 
-    static x_type as_x_type(DenseVector const& x)
-    {
-        std::vector<double> newX;
+	_data_point(x_type x, double y)
+		: x(std::move(x)),
+		y(y)
+	{
+	}
 
-        for (int i = 0; i < x.size(); i++)
-        {
-            newX.push_back(x(i));
-        }
+	bool operator<(const _data_point& rhs) const
+	{
+		if (this->getDimX() != rhs.getDimX())
+			throw Exception("DataPoint::operator<: Cannot compare data points of different dimensions");
 
-        return newX;
-    }
+		if constexpr (!std::is_same_v<x_type, DenseVector>) {
+			return x < rhs.x;
+		}
+		else {
+			return std::lexicographical_compare(x.begin(), x.end(), rhs.x.begin(), rhs.x.end());
+		}
+	}
 
-public:
-    DataPoint(double x, double y)
-    :   x(1, x),
-        y(y)
-    {
-    }
+	x_type x;
+	double y;
 
-    DataPoint(std::vector<double> x, double y)
-    :   x(x),
-        y(y)
-    {
-    }
-
-    DataPoint(DenseVector const& x, double y)
-    :   x(as_x_type(x)),
-        y(y)
-    {
-    }
-
-    bool operator<(const DataPoint &rhs) const
-    {
-        if (this->getDimX() != rhs.getDimX())
-            throw Exception("DataPoint::operator<: Cannot compare data points of different dimensions");
-
-        return x < rhs.x;
-    }
-
-    std::vector<double> x;
-    double y;
-
-    unsigned int getDimX() const { return x.size(); }
+	unsigned int getDimX() const { return x.size(); }
 };
+
+using DataPoint = _data_point<std::vector<double>>;
 
 } // namespace SPLINTER
 

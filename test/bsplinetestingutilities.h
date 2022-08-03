@@ -12,11 +12,39 @@
 
 #include <bsplinebuilder.h>
 #include <datatable.h>
+#include <testingutilities.h>
+#include <utilities.h>
+
 
 namespace SPLINTER
 {
 
-_data_table<> sampleTestFunction();
+inline auto sampleTestFunction()
+{
+    data_table_x<DenseVector> samples;
+
+    // Sample function
+    auto x0_vec = linspace(0,2,20);
+    auto x1_vec = linspace(0,2,20);
+    DenseVector x(2);
+    double y;
+
+    for (auto x0 : x0_vec)
+    {
+        for (auto x1 : x1_vec)
+        {
+            // Sample function at x
+            x(0) = x0;
+            x(1) = x1;
+            y = sixHumpCamelBack(x);
+
+            // Store sample
+            samples.addSample(x,y);
+        }
+    }
+
+    return samples;
+}
 
 /*
  * Test knot insertion
