@@ -18,6 +18,19 @@
 namespace SPLINTER
 {
 
+template <class T>
+struct supports_duplicates;
+
+template <class... Ts>
+struct supports_duplicates<std::set<Ts...>> : std::false_type {};
+
+template <class... Ts>
+struct supports_duplicates<std::multiset<Ts...>> : std::true_type {};
+
+template <class T>
+constexpr bool supports_duplicates_v = supports_duplicates<T>::value;
+
+
 /*
  * DataTable is a class for storing multidimensional data samples (x,y).
  * The samples are stored in a continuously sorted table.
@@ -27,10 +40,11 @@ template <class samples_type = std::multiset<DataPoint>>
 class SPLINTER_API _data_table
 {
 public:
-    _data_table(bool allowDuplicates = false)
+    _data_table(bool allowDuplicates)
     : allowDuplicates(allowDuplicates),
       numVariables(0)
     {
+        assert(allowDuplicates <= supports_duplicates_v<samples_type>);
     }
 
     using data_point = typename samples_type::value_type;
