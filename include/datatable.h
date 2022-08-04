@@ -47,15 +47,6 @@ public:
         // Check if the sample has been added already
         if (samples.count(sample) > 0) {
             if (!allowDuplicates) {
-#ifndef NDEBUG
-                std::cout
-                    << "Discarding duplicate sample because allowDuplicates is false!"
-                    << std::endl;
-                std::cout
-                    << "Initialise with DataTable(true) to set it to true."
-                    << std::endl;
-#endif // NDEBUG
-
                 return;
             }
         }
