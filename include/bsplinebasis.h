@@ -26,13 +26,17 @@ public:
     // Evaluation
     template <class x_type>
     SparseVector eval(x_type const& x) const {
-        // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
-        std::vector<SparseVector> basisFunctionValues;
+        if constexpr (std::is_floating_point_v<x_type>) {
+            return bases[0].eval(x);
+        } else {
+            // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
+            std::vector<SparseVector> basisFunctionValues;
 
-        for (int var = 0; var < x.size(); var++)
-            basisFunctionValues.push_back(bases[var].eval(x[var]));
+            for (int var = 0; var < x.size(); var++)
+                basisFunctionValues.push_back(bases[var].eval(x[var]));
 
-        return kroneckerProductVectors(basisFunctionValues);
+            return kroneckerProductVectors(basisFunctionValues);
+        }
     }
 
     DenseMatrix evalBasisJacobianOld(DenseVector& x) const; // Depricated

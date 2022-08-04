@@ -39,6 +39,7 @@ public:
     static constexpr bool allowDuplicates = supports_duplicates_v<samples_type>;
 
     using data_point = typename samples_type::value_type;
+    using x_type     = typename data_point::x_type;
 
     /*
      * Functions for adding a sample (x,y)
@@ -94,7 +95,11 @@ public:
         int i = 0;
         for (auto& sample : samples) {
             for (unsigned int j = 0; j < numVariables; j++) {
-                table[j][i] = sample.x[j];
+                if constexpr (std::is_floating_point_v<x_type>) {
+                    table[j][i] = sample.x;
+                } else {
+                    table[j][i] = sample.x[j];
+                }
             }
             i++;
         }
