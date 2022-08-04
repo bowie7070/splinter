@@ -46,7 +46,6 @@ public:
     void addSample(data_point const& sample) {
         if (getNumSamples() == 0) {
             numVariables = sample.getDimX();
-            initDataStructures();
         }
 
         if (sample.getDimX() != numVariables) {
@@ -62,8 +61,6 @@ public:
         }
 
         samples.insert(sample);
-
-        recordGridPoint(sample);
     }
 
     template <class x_type>
@@ -80,8 +77,6 @@ public:
     unsigned int getNumVariables() const { return numVariables; }
     unsigned int getNumSamples() const { return samples.size(); }
     samples_type const& getSamples() const { return samples; }
-
-    std::vector<std::set<double>> getGrid() const { return grid; }
 
     /*
     * Get table of samples x-values,
@@ -120,31 +115,6 @@ private:
     unsigned int numVariables = 0;
 
     samples_type samples;
-    std::vector<std::set<double>> grid;
-
-    // Initialise grid to be a std::vector of xDim std::sets
-    void initDataStructures() {
-        for (unsigned int i = 0; i < getNumVariables(); i++) {
-            grid.push_back(std::set<double>());
-        }
-    }
-
-    unsigned int getNumSamplesRequired() const {
-        unsigned long samplesRequired = 1;
-        unsigned int i                = 0;
-        for (auto& variable : grid) {
-            samplesRequired *= (unsigned long)variable.size();
-            i++;
-        }
-
-        return (i > 0 ? samplesRequired : (unsigned long)0);
-    }
-
-    void recordGridPoint(data_point const& sample) {
-        for (unsigned int i = 0; i < getNumVariables(); i++) {
-            grid[i].insert(sample.x[i]);
-        }
-    }
 };
 
 template <class x_type>
