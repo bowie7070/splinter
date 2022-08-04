@@ -112,12 +112,6 @@ public:
 
     // Build B-spline
     BSpline build() const {
-        // Check data
-        // TODO: Remove this test
-        if (!_data.isGridComplete())
-            throw Exception(
-                "BSpline::Builder::build: Cannot create B-spline from irregular (incomplete) grid.");
-
         // Build knot vectors
         // Build B-spline (with default coefficients)
         auto bspline = BSpline(computeKnotVectors(), _degrees);
@@ -372,7 +366,7 @@ private:
             throw Exception(
                 "BSpline::Builder::computeKnotVectors: Inconsistent sizes on input vectors.");
 
-        std::vector<std::vector<double>> grid = _data.getTableX();
+        std::vector<std::vector<double>> grid = _data._getTableX();
 
         std::vector<std::vector<double>> knotVectors;
 
