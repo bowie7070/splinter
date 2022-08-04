@@ -26,7 +26,6 @@ class SPLINTER_API _data_table {
 public:
     _data_table(bool allowDuplicates = false) :
         allowDuplicates(allowDuplicates),
-        numDuplicates(0),
         numVariables(0) {}
 
     using data_point = typename samples_type::value_type;
@@ -59,8 +58,6 @@ public:
 
                 return;
             }
-
-            numDuplicates++;
         }
 
         samples.insert(sample);
@@ -120,7 +117,6 @@ public:
 
 private:
     bool allowDuplicates;
-    unsigned int numDuplicates;
     unsigned int numVariables;
 
     samples_type samples;
