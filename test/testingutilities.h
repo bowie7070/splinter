@@ -407,10 +407,35 @@ void checkNorms(DenseMatrix normValues, size_t numPoints, double one_eps, double
 void checkNorm(DenseMatrix normValues, TestType type, size_t numPoints, double one_eps, double two_eps, double inf_eps);
 void _checkNorm(DenseMatrix normValues, int row, size_t numPoints, double one_eps, double two_eps, double inf_eps);
 
+template <class callable>
 void testApproximation(std::vector<TestFunction *> funcs,
-                       std::function<Function *(const _data_table<>&table)> approx_gen_func,
+                       callable approx_gen_func,
                        TestType type, size_t numSamplePoints, size_t numEvalPoints,
-                       double one_eps, double two_eps, double inf_eps);
+                       double one_eps, double two_eps, double inf_eps)
+{
+    for (auto& exact : funcs) {
+
+        auto dim = exact->getNumVariables();
+        CHECK(dim > 0);
+        if (dim > 0) {
+            auto samplePoints = linspace(dim, -5, 5, std::pow(numSamplePoints, 1.0 / dim));
+            auto evalPoints = linspace(dim, -4.95, 4.95, std::pow(numEvalPoints, 1.0 / dim));
+
+            auto table = sample(exact, samplePoints);
+
+            Function* approx = approx_gen_func(table);
+
+            INFO("Function: " << exact->getFunctionStr());
+            INFO("Approximant: " << approx->getDescription());
+
+            DenseMatrix errorNorms = getErrorNorms(exact, approx, evalPoints);
+
+            checkNorm(errorNorms, type, evalPoints.size(), one_eps, two_eps, inf_eps);
+
+            delete approx;
+        }
+    }
+}
 
 } // namespace SPLINTER
 
