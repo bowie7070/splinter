@@ -21,7 +21,7 @@ namespace SPLINTER
 
 inline auto sampleTestFunction()
 {
-    data_table_x<DenseVector> samples(false);
+    data_table_set_x<DenseVector> samples;
 
     // Sample function
     auto x0_vec = linspace(0,2,20);

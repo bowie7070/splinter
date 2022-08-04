@@ -49,7 +49,7 @@ std::vector<std::vector<double>> linspace(int dim);
 std::vector<std::vector<double>> linspace(int dim, unsigned int pointsPerDim);
 
 inline auto sample(const Function& func, std::vector<std::vector<double>>& points) {
-    _data_table<> table(false);
+    data_table_set_x<std::vector<double>> table;
 
     for (auto& x : points) {
         table.addSample(x, func.eval(x));
