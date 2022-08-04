@@ -21,14 +21,10 @@ namespace SPLINTER
 	* Note that x is a vector and y is a scalar.
 	*/
 
-template <class x_type>
+template <class _x_type>
 struct _data_point
 {
-	_data_point(double x, double y)
-		: x{ x },
-		y(y)
-	{
-	}
+	using x_type = _x_type;
 
 	_data_point(x_type x, double y)
 		: x(std::move(x)),
@@ -52,7 +48,13 @@ struct _data_point
 	x_type x;
 	double y;
 
-	unsigned int getDimX() const { return x.size(); }
+	unsigned int getDimX() const {
+		if constexpr (std::is_floating_point_v<x_type>) {
+			return 1;
+		} else{
+			return x.size(); 
+		}
+	}
 };
 
 using DataPoint = _data_point<std::vector<double>>;
