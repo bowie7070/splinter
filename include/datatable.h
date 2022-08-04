@@ -36,11 +36,7 @@ constexpr bool supports_duplicates_v = supports_duplicates<T>::value;
 template <class samples_type = std::multiset<DataPoint>>
 class SPLINTER_API _data_table {
 public:
-    _data_table(bool allowDuplicates) :
-        allowDuplicates(allowDuplicates),
-        numVariables(0) {
-        assert(allowDuplicates <= supports_duplicates_v<samples_type>);
-    }
+    static constexpr bool allowDuplicates = supports_duplicates_v<samples_type>;
 
     using data_point = typename samples_type::value_type;
 
@@ -121,8 +117,7 @@ public:
     }
 
 private:
-    bool allowDuplicates;
-    unsigned int numVariables;
+    unsigned int numVariables = 0;
 
     samples_type samples;
     std::vector<std::set<double>> grid;
@@ -153,7 +148,10 @@ private:
 };
 
 template <class x_type>
-using data_table_x = _data_table<std::multiset<_data_point<x_type>>>;
+using data_table_multiset_x = _data_table<std::multiset<_data_point<x_type>>>;
+
+template <class x_type>
+using data_table_set_x = _data_table<std::set<_data_point<x_type>>>;
 
 using DataTable = _data_table<>;
 
