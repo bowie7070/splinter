@@ -27,9 +27,8 @@ template <class samples_type = std::multiset<DataPoint>>
 class SPLINTER_API _data_table
 {
 public:
-    _data_table(bool allowDuplicates = false, bool allowIncompleteGrid = false)
+    _data_table(bool allowDuplicates = false)
     : allowDuplicates(allowDuplicates),
-      allowIncompleteGrid(allowIncompleteGrid),
       numDuplicates(0),
       numVariables(0)
     {
@@ -101,10 +100,8 @@ public:
     * Get table of samples x-values,
     * i.e. table[i][j] is the value of variable i at sample j
     */
-    std::vector< std::vector<double> > getTableX() const
+    std::vector< std::vector<double> > _getTableX() const
     {
-        gridCompleteGuard();
-
         // Initialize table
         std::vector<std::vector<double>> table;
         for (unsigned int i = 0; i < numVariables; i++)
@@ -136,17 +133,10 @@ public:
             y.push_back(it->y);
         }
         return y;
-    }
-    
-    bool isGridComplete() const
-    {
-        return samples.size() > 0 && samples.size() - numDuplicates == getNumSamplesRequired();
-    }
-
+    }      
 
 private:
     bool allowDuplicates;
-    bool allowIncompleteGrid;
     unsigned int numDuplicates;
     unsigned int numVariables;
 
@@ -182,17 +172,7 @@ private:
         {
             grid[i].insert(sample.x[i]);
         }
-    }
-
-    // Used by functions that require the grid to be complete before they start their operation
-    // This function prints a message and exits the program if the grid is not complete.
-    void gridCompleteGuard() const
-    {
-        if (!(isGridComplete() || allowIncompleteGrid))
-        {
-            throw Exception("DataTable::gridCompleteGuard: The grid is not complete yet!");
-        }
-    }
+    }    
 };
 
 template <class x_type>
