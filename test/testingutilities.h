@@ -63,7 +63,27 @@ double getError(double exactVal, double approxVal);
 
 bool equalsWithinRange(double a, double b, double margin = 0.0);
 
-bool isSymmetricHessian(const Function &approx, const DenseVector &x);
+/*
+ * Checks that the hessian is symmetric across the diagonal
+ */
+template <class callable>
+bool isSymmetricHessian(const callable &approx, const DenseVector &x)
+{
+    DenseMatrix hessian = approx.evalHessian(x);
+
+    for(int row = 0; row < (int) hessian.rows(); ++row)
+    {
+        for(int col = 0; col < (int) hessian.cols(); ++col)
+        {
+            if(getError(hessian(row, col), hessian(col, row)) > 1e-9)
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 
 
 template <class callable>
