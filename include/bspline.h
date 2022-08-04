@@ -45,6 +45,7 @@ public:
         std::vector<std::vector<double>> knotVectors,
         std::vector<unsigned int> basisDegrees);
 
+    using Function::centralDifference;
     using Function::getNumVariables;
 
     virtual BSpline* clone() const { return new BSpline(*this); }

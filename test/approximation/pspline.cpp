@@ -34,7 +34,7 @@ TEST_CASE("PSpline function" COMMON_TEXT, COMMON_TAGS "[function-value]")
                                          .smoothing(BSpline::Smoothing::PSPLINE)
                                          .alpha(0.03)
                                          .build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -57,7 +57,7 @@ TEST_CASE("PSpline jacobian" COMMON_TEXT, COMMON_TAGS "[jacobian]")
                                          .smoothing(BSpline::Smoothing::PSPLINE)
                                          .alpha(0.03)
                                          .build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -76,7 +76,7 @@ TEST_CASE("PSpline hessian" COMMON_TEXT, COMMON_TAGS "[hessian]")
                                          .smoothing(BSpline::Smoothing::PSPLINE)
                                          .alpha(0.03)
                                          .build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,   // Number of points to sample at
                              1337); // Number of points to test against

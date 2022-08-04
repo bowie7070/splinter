@@ -41,7 +41,7 @@ TEST_CASE("Linear BSpline function" COMMON_TEXT " densely sampled", COMMON_TAGS 
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              }
                 ,
                              5000,  // Number of points to sample at
@@ -72,7 +72,7 @@ TEST_CASE("Linear BSpline function" COMMON_TEXT " sampled with medium density", 
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              }
                 ,
                              500,  // Number of points to sample at
@@ -103,7 +103,7 @@ TEST_CASE("Linear BSpline function" COMMON_TEXT " sparsely sampled", COMMON_TAGS
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              }
                 ,
                              50,  // Number of points to sample at
@@ -124,7 +124,7 @@ TEST_CASE("Linear BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::line
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -140,7 +140,7 @@ TEST_CASE("Linear BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::linea
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(1).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,
                              1337);
@@ -170,7 +170,7 @@ TEST_CASE("Quadratic BSpline function" COMMON_TEXT " densely sampled", COMMON_TA
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              5000,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -200,7 +200,7 @@ TEST_CASE("Quadratic BSpline function" COMMON_TEXT " sampled with normal density
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              500,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -230,7 +230,7 @@ TEST_CASE("Quadratic BSpline function" COMMON_TEXT " sparsely sampled", COMMON_T
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              50,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -250,7 +250,7 @@ TEST_CASE("Quadratic BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::q
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -266,7 +266,7 @@ TEST_CASE("Quadratic BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::qu
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(2).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,   // Number of points to sample at
                              1337); // Number of points to test against
@@ -296,7 +296,7 @@ TEST_CASE("Cubic BSpline function" COMMON_TEXT " densely sampled", COMMON_TAGS "
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              5000,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -326,7 +326,7 @@ TEST_CASE("Cubic BSpline function" COMMON_TEXT " sampled with normal density", C
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              500,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -356,7 +356,7 @@ TEST_CASE("Cubic BSpline function" COMMON_TEXT " sparsely sampled", COMMON_TAGS 
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              80,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -376,7 +376,7 @@ TEST_CASE("Cubic BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::cubic
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -392,7 +392,7 @@ TEST_CASE("Cubic BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::cubic]
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(3).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,   // Number of points to sample at
                              1337); // Number of points to test against
@@ -422,7 +422,7 @@ TEST_CASE("Quartic BSpline function" COMMON_TEXT " densely sampled", COMMON_TAGS
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              5000,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -452,7 +452,7 @@ TEST_CASE("Quartic BSpline function" COMMON_TEXT " sampled with normal density",
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              500,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -482,7 +482,7 @@ TEST_CASE("Quartic BSpline function" COMMON_TEXT " sparsely sampled", COMMON_TAG
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              200,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -502,7 +502,7 @@ TEST_CASE("Quartic BSpline jacobian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::qua
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,  // Number of points to sample at
                              1337, // Number of points to test against
@@ -518,7 +518,7 @@ TEST_CASE("Quartic BSpline hessian" COMMON_TEXT, COMMON_TAGS "[bsplinetype::quar
                              [](const DataTable &table)
                              {
                                  BSpline bs = BSpline::Builder(table).degree(4).build();
-                                 return (Function*) new BSpline(bs);
+                                 return std::make_unique<BSpline>(bs);
                              },
                              300,   // Number of points to sample at
                              1337); // Number of points to test against
