@@ -40,6 +40,7 @@ public:
     BSpline(DenseVector coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
 
     using Function::getNumVariables;
+    using Function::centralDifference;
 
     virtual BSpline* clone() const { return new BSpline(*this); }
  

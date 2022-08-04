@@ -85,6 +85,14 @@ bool isSymmetricHessian(const callable &approx, const DenseVector &x)
     return true;
 }
 
+template <class T>
+struct is_unique_ptr : std::false_type {};
+
+template <class... Ts>
+struct is_unique_ptr<std::unique_ptr<Ts...>> : std::true_type {};
+
+template <class T>
+constexpr bool is_unique_ptr_v = is_unique_ptr<T>::value;
 
 template <class callable>
 void compareFunctionValue(TestFunction *exact,
@@ -99,7 +107,9 @@ void compareFunctionValue(TestFunction *exact,
 
     DataTable table = sample(exact, samplePoints);
 
-    std::unique_ptr<Function> approx{ approx_gen_func(table) };
+    auto approx{ approx_gen_func(table) };
+    static_assert(is_unique_ptr_v<decltype(approx)>);
+
 
     INFO("Approximant: " << approx->getDescription());
     INFO("Function: " << exact->getFunctionStr());
@@ -194,7 +204,8 @@ void compareJacobianValue(TestFunction *exact,
 
     DataTable table = sample(exact, samplePoints);
 
-    std::unique_ptr<Function> approx{ approx_gen_func(table) };
+    auto approx{ approx_gen_func(table) };
+    static_assert(is_unique_ptr_v<decltype(approx)>);
 
     INFO("Approximant: " << approx->getDescription());
     INFO("Function: " << exact->getFunctionStr());
@@ -316,7 +327,8 @@ void checkHessianSymmetry(TestFunction *exact,
 
     DataTable table = sample(exact, samplePoints);
 
-    std::unique_ptr<Function> approx{ approx_gen_func(table) };
+    auto approx{ approx_gen_func(table) };
+    static_assert(is_unique_ptr_v<decltype(approx)>);
 
     INFO("Approximant: " << approx->getDescription());
     INFO("Function: " << exact->getFunctionStr());
