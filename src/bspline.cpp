@@ -18,14 +18,6 @@
 namespace SPLINTER
 {
 
-BSpline::BSpline()
-    : numVariables(1)
-{}
-
-BSpline::BSpline(unsigned int numVariables)
-    : numVariables(numVariables)
-{}
-
 /*
  * Constructors for multivariate B-spline using explicit data
  */
