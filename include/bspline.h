@@ -29,8 +29,6 @@ public:
     enum class Smoothing;
     enum class KnotSpacing;
 
-    BSpline(unsigned int numVariables);
-
     /**
      * Construct B-spline from knot vectors, coefficients, and basis degrees
      */
@@ -128,7 +126,6 @@ public:
     }
 
 private:
-    BSpline();
     unsigned int numVariables; // Dimension of domain (size of x)
     BSplineBasis basis;
 
