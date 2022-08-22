@@ -13,7 +13,7 @@
 namespace SPLINTER {
 
 BSplineBasis::BSplineBasis(
-    std::vector<std::vector<double>>& knotVectors,
+    std::vector<std::vector<double>> const& knotVectors,
     std::vector<unsigned int> basisDegrees) :
     numVariables(knotVectors.size()) {
     if (knotVectors.size() != basisDegrees.size())

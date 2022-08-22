@@ -64,26 +64,9 @@ DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
     return knot_averages;
 }
 
-/*
- * Constructors for multivariate B-spline using explicit data
- */
-BSpline::BSpline(
-    std::vector<std::vector<double>> knotVectors,
-    std::vector<unsigned int> basisDegrees) :
-    basis(BSplineBasis(knotVectors, basisDegrees)),
-    coefficients(DenseVector::Zero(1)) {
-    // Initialize coefficients to ones
-    setCoefficients(DenseVector::Ones(basis.getNumBasisFunctions()));
-}
-
-BSpline::BSpline(
-    DenseVector coefficients,
-    std::vector<std::vector<double>> knotVectors,
-    std::vector<unsigned int> basisDegrees) :
-    basis(BSplineBasis(knotVectors, basisDegrees)),
-    coefficients(coefficients) {
-    setCoefficients(coefficients);
-}
+BSpline::BSpline(DenseVector coefficients, BSplineBasis _basis) :
+    basis(std::move(_basis)),
+    coefficients(std::move(coefficients)) {}
 
 /**
  * Returns the (1 x getNumVariables()) Jacobian evaluated at x
@@ -152,12 +135,6 @@ std::vector<double> BSpline::getDomainUpperBound() const {
 
 std::vector<double> BSpline::getDomainLowerBound() const {
     return basis.getSupportLowerBound();
-}
-
-void BSpline::setCoefficients(DenseVector const& coefficients) {
-    assert(coefficients.size() == getNumBasisFunctions());
-
-    this->coefficients = coefficients;
 }
 
 void BSpline::updateControlPoints(DenseMatrix const& A) {

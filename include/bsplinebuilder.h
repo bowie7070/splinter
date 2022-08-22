@@ -112,15 +112,10 @@ public:
 
     // Build B-spline
     BSpline build() const {
-        // Build knot vectors
-        // Build B-spline (with default coefficients)
-        auto bspline = BSpline(computeKnotVectors(), _degrees);
+        BSplineBasis basis{computeKnotVectors(), _degrees};
+        auto coefficients = computeCoefficients(basis);
 
-        // Compute coefficients from samples and update B-spline
-        auto coefficients = computeCoefficients(bspline.basis);
-        bspline.setCoefficients(coefficients);
-
-        return bspline;
+        return BSpline(std::move(coefficients), std::move(basis));
     }
 
 private:
