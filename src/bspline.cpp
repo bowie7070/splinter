@@ -138,13 +138,6 @@ SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
     return Bi.sparseView();
 }
 
-std::vector<unsigned int> BSpline::getNumBasisFunctionsPerVariable() const {
-    std::vector<unsigned int> ret;
-    for (unsigned int i = 0; i < getNumVariables(); i++)
-        ret.push_back(basis.getNumBasisFunctions(i));
-    return ret;
-}
-
 std::vector<std::vector<double>> BSpline::getKnotVectors() const {
     return basis.getKnotVectors();
 }
