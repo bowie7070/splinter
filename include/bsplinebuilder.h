@@ -120,7 +120,7 @@ public:
         auto bspline = BSpline(computeKnotVectors(), _degrees);
 
         // Compute coefficients from samples and update B-spline
-        auto coefficients = computeCoefficients(bspline);
+        auto coefficients = computeCoefficients(bspline.basis);
         bspline.setCoefficients(coefficients);
 
         return bspline;
@@ -137,7 +137,7 @@ private:
 
     using matrix = Eigen::SparseMatrix<double, Eigen::RowMajor>;
 
-    auto computeBasisFunctionMatrix(const BSpline &bspline) const
+    auto computeBasisFunctionMatrix(const BSplineBasis &basis) const
     {
         unsigned int numVariables = _data.getNumVariables();
         unsigned int numSamples = _data.getNumSamples();
@@ -150,7 +150,7 @@ private:
         int i = 0;
         for (auto const& sample: _data.csamples())
         {
-            auto row = bspline.evalBasis(sample.x);
+            auto row = basis.eval(sample.x);
 
             using row_type = decltype(row);
             using iterator = typename row_type::InnerIterator;
@@ -162,7 +162,7 @@ private:
             ++i;
         }
 
-        matrix A(numSamples, bspline.getNumBasisFunctions());
+        matrix A(numSamples, basis.getNumBasisFunctions());
         A.setFromTriplets(coefficients.begin(), coefficients.end());
 
         return A;
@@ -172,13 +172,13 @@ private:
     * Function for generating second order finite-difference matrix, which is used for penalizing the
     * (approximate) second derivative in control point calculation for P-splines.
     */
-    auto getSecondOrderFiniteDifferenceMatrix(const BSpline &bspline) const
+    auto getSecondOrderFiniteDifferenceMatrix(const BSplineBasis &basis) const
     {
-        unsigned int numVariables = bspline.getNumVariables();
+        unsigned int numVariables = basis.getNumVariables();
 
         // Number of (total) basis functions - defines the number of columns in D
-        unsigned int numCols = bspline.getNumBasisFunctions();
-        std::vector<unsigned int> numBasisFunctions = bspline.getNumBasisFunctionsPerVariable();
+        unsigned int numCols = basis.getNumBasisFunctions();
+        std::vector<unsigned int> numBasisFunctions = basis.getNumBasisFunctionsPerVariable();
 
         // Number of basis functions (and coefficients) in each variable
         std::vector<unsigned int> dims;
@@ -284,9 +284,9 @@ private:
     * R = Regularization matrix,
     * alpha = regularization parameter.
     */
-    DenseVector computeCoefficients(const BSpline& bspline) const
+    DenseVector computeCoefficients(const BSplineBasis& basis) const
     {
-        auto const B = computeBasisFunctionMatrix(bspline);
+        auto const B = computeBasisFunctionMatrix(basis);
         matrix A;
         DenseVector b = getSamplePointValues();
 
@@ -331,7 +331,7 @@ private:
             unsigned int numSamples = _data.getNumSamples();
 
             // Second order finite difference matrix
-            auto const D = getSecondOrderFiniteDifferenceMatrix(bspline);
+            auto const D = getSecondOrderFiniteDifferenceMatrix(basis);
 
             // Left-hand side matrix
             A = B.transpose() * B + _alpha*D.transpose()*D;

@@ -80,6 +80,14 @@ public:
     // Support related
     SparseMatrix reduceSupport(std::vector<double>& lb, std::vector<double>& ub);
 
+    std::vector<unsigned int> getNumBasisFunctionsPerVariable() const
+    {
+        std::vector<unsigned int> ret;
+        for (unsigned int i = 0; i < getNumVariables(); i++)
+            ret.push_back(getNumBasisFunctions(i));
+        return ret;
+    }
+
 private:
     std::vector<BSplineBasis1D> bases;
     unsigned int numVariables;

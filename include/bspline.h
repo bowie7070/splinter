@@ -80,8 +80,6 @@ public:
         return coefficients.size();
     }
 
-    std::vector<unsigned int> getNumBasisFunctionsPerVariable() const;
-
     unsigned int getNumBasisFunctions() const
     {
         return basis.getNumBasisFunctions();
