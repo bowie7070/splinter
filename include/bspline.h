@@ -36,10 +36,6 @@ public:
         std::vector<std::vector<double>> knotVectors,
         std::vector<unsigned int> basisDegrees);
     BSpline(
-        std::vector<double> coefficients,
-        std::vector<std::vector<double>> knotVectors,
-        std::vector<unsigned int> basisDegrees);
-    BSpline(
         DenseVector coefficients,
         std::vector<std::vector<double>> knotVectors,
         std::vector<unsigned int> basisDegrees);
