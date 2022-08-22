@@ -120,9 +120,9 @@ public:
 
     std::string getDescription() const;
 
-    inline unsigned int getNumVariables() const
+    unsigned int getNumVariables() const
     {
-        return numVariables;
+        return basis.getNumVariables();
     }
 
     auto centralDifference(DenseVector const& x) const
@@ -132,7 +132,6 @@ public:
 
 
 private:
-    unsigned int numVariables; // Dimension of domain (size of x)
     BSplineBasis basis;
 
     /*
