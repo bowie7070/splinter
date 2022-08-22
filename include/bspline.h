@@ -87,7 +87,6 @@ public:
         return basis.getNumBasisFunctions();
     }
 
-    DenseMatrix getControlPoints() const;
     std::vector< std::vector<double>> getKnotVectors() const;
     std::vector<unsigned int> getBasisDegrees() const;
     std::vector<double> getDomainUpperBound() const;
@@ -97,8 +96,6 @@ public:
      * Setters
      */
     void setCoefficients(const DenseVector &coefficients);
-    void setControlPoints(const DenseMatrix &controlPoints);
-    void checkControlPoints() const;
 
     // Linear transformation of control points (B-spline has affine invariance)
     void updateControlPoints(const DenseMatrix &A);
