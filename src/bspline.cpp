@@ -71,12 +71,9 @@ BSpline::BSpline(
     std::vector<std::vector<double>> knotVectors,
     std::vector<unsigned int> basisDegrees) :
     basis(BSplineBasis(knotVectors, basisDegrees)),
-    coefficients(DenseVector::Zero(1)),
-    knotaverages(computeKnotAverages(basis)) {
+    coefficients(DenseVector::Zero(1)) {
     // Initialize coefficients to ones
     setCoefficients(DenseVector::Ones(basis.getNumBasisFunctions()));
-
-    checkControlPoints();
 }
 
 BSpline::BSpline(
@@ -84,11 +81,8 @@ BSpline::BSpline(
     std::vector<std::vector<double>> knotVectors,
     std::vector<unsigned int> basisDegrees) :
     basis(BSplineBasis(knotVectors, basisDegrees)),
-    coefficients(coefficients),
-    knotaverages(computeKnotAverages(basis)) {
+    coefficients(coefficients) {
     setCoefficients(coefficients);
-
-    checkControlPoints();
 }
 
 /**
@@ -167,53 +161,15 @@ std::vector<double> BSpline::getDomainLowerBound() const {
     return basis.getSupportLowerBound();
 }
 
-DenseMatrix BSpline::getControlPoints() const {
-    int nc = coefficients.size();
-    DenseMatrix controlPoints(nc, getNumVariables() + 1);
-
-    controlPoints.block(0, 0, nc, getNumVariables()) = knotaverages;
-    controlPoints.block(0, getNumVariables(), nc, 1) = coefficients;
-
-    return controlPoints;
-}
-
 void BSpline::setCoefficients(DenseVector const& coefficients) {
-    if (coefficients.size() != getNumBasisFunctions())
-        throw Exception(
-            "BSpline::setControlPoints: Incompatible size of coefficient vector.");
+    assert(coefficients.size() == getNumBasisFunctions());
 
     this->coefficients = coefficients;
-    checkControlPoints();
-}
-
-void BSpline::setControlPoints(DenseMatrix const& controlPoints) {
-    if (controlPoints.cols() != getNumVariables() + 1)
-        throw Exception(
-            "BSpline::setControlPoints: Incompatible size of control point matrix.");
-
-    int nc = controlPoints.rows();
-
-    knotaverages = controlPoints.block(0, 0, nc, getNumVariables());
-    coefficients = controlPoints.block(0, getNumVariables(), nc, 1);
-
-    checkControlPoints();
 }
 
 void BSpline::updateControlPoints(DenseMatrix const& A) {
-    if (A.cols() != coefficients.rows() || A.cols() != knotaverages.rows())
-        throw Exception(
-            "BSpline::updateControlPoints: Incompatible size of linear transformation matrix.");
+    assert(A.cols() == coefficients.rows());
     coefficients = A * coefficients;
-    knotaverages = A * knotaverages;
-}
-
-void BSpline::checkControlPoints() const {
-    if (coefficients.rows() != knotaverages.rows())
-        throw Exception(
-            "BSpline::checkControlPoints: Inconsistent size of coefficients and knot averages matrices.");
-    if (knotaverages.cols() != getNumVariables())
-        throw Exception(
-            "BSpline::checkControlPoints: Inconsistent size of knot averages matrix.");
 }
 
 bool BSpline::pointInDomain(DenseVector x) const {
