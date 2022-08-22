@@ -21,7 +21,6 @@ namespace SPLINTER
 class BSplineBasis
 {
 public:
-    BSplineBasis();
     BSplineBasis(std::vector<std::vector<double>> &knotVectors, std::vector<unsigned int> basisDegrees);
 
     // Evaluation

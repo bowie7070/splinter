@@ -14,10 +14,6 @@
 namespace SPLINTER
 {
 
-BSplineBasis::BSplineBasis()
-{
-}
-
 BSplineBasis::BSplineBasis(std::vector< std::vector<double> > &knotVectors, std::vector<unsigned int> basisDegrees)
     : numVariables(knotVectors.size())
 {

@@ -33,11 +33,6 @@ BSpline::BSpline(std::vector<std::vector<double>> knotVectors, std::vector<unsig
     checkControlPoints();
 }
 
-BSpline::BSpline(std::vector<double> coefficients, std::vector<std::vector<double>> knotVectors, std::vector<unsigned int> basisDegrees)
-    : BSpline(vectorToDenseVector(coefficients), knotVectors, basisDegrees)
-{
-}
-
 BSpline::BSpline(DenseVector coefficients, std::vector<std::vector<double>> knotVectors, std::vector<unsigned int> basisDegrees)
     : numVariables(knotVectors.size()),
       basis(BSplineBasis(knotVectors, basisDegrees)),

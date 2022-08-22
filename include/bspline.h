@@ -35,7 +35,6 @@ public:
      * Construct B-spline from knot vectors, coefficients, and basis degrees
      */
     BSpline(std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
-    BSpline(std::vector<double> coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
     BSpline(DenseVector coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
 
     template <class x_type>
