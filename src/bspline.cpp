@@ -17,6 +17,54 @@
 
 namespace SPLINTER
 {
+// Computes knot averages.
+DenseMatrix computeKnotAverages(BSplineBasis const& basis)
+{
+    // Calculate knot averages for each knot vector
+    std::vector<DenseVector> mu_vectors;
+    for (unsigned int i = 0; i < basis.getNumVariables(); i++)
+    {
+        std::vector<double> knots = basis.getKnotVector(i);
+        DenseVector mu = DenseVector::Zero(basis.getNumBasisFunctions(i));
+
+        for (unsigned int j = 0; j < basis.getNumBasisFunctions(i); j++)
+        {
+            double knotAvg = 0;
+            for (unsigned int k = j+1; k <= j+basis.getBasisDegree(i); k++)
+            {
+                knotAvg += knots.at(k);
+            }
+            mu(j) = knotAvg/basis.getBasisDegree(i);
+        }
+        mu_vectors.push_back(mu);
+    }
+
+    // Calculate vectors of ones (with same length as corresponding knot average vector)
+    std::vector<DenseVector> knotOnes;
+    for (unsigned int i = 0; i < basis.getNumVariables(); i++)
+        knotOnes.push_back(DenseVector::Ones(mu_vectors.at(i).rows()));
+
+    // Fill knot average matrix one column at the time
+    DenseMatrix knot_averages = DenseMatrix::Zero(basis.getNumBasisFunctions(), basis.getNumVariables());
+
+    for (unsigned int i = 0; i < basis.getNumVariables(); i++)
+    {
+        DenseMatrix mu_ext(1,1); mu_ext(0,0) = 1;
+        for (unsigned int j = 0; j < basis.getNumVariables(); j++)
+        {
+            DenseMatrix temp = mu_ext;
+            if (i == j)
+                mu_ext = Eigen::kroneckerProduct(temp, mu_vectors.at(j));
+            else
+                mu_ext = Eigen::kroneckerProduct(temp, knotOnes.at(j));
+        }
+        if (mu_ext.rows() != basis.getNumBasisFunctions())
+            throw Exception("BSpline::computeKnotAverages: Incompatible size of knot average matrix.");
+        knot_averages.block(0, i, basis.getNumBasisFunctions(), 1) = mu_ext;
+    }
+
+    return knot_averages;
+}
 
 /*
  * Constructors for multivariate B-spline using explicit data
@@ -24,7 +72,7 @@ namespace SPLINTER
 BSpline::BSpline(std::vector<std::vector<double>> knotVectors, std::vector<unsigned int> basisDegrees)
     : basis(BSplineBasis(knotVectors, basisDegrees)),
       coefficients(DenseVector::Zero(1)),
-      knotaverages(computeKnotAverages())
+      knotaverages(computeKnotAverages(basis))
 {
     // Initialize coefficients to ones
     setCoefficients(DenseVector::Ones(basis.getNumBasisFunctions()));
@@ -35,7 +83,7 @@ BSpline::BSpline(std::vector<std::vector<double>> knotVectors, std::vector<unsig
 BSpline::BSpline(DenseVector coefficients, std::vector<std::vector<double>> knotVectors, std::vector<unsigned int> basisDegrees)
     : basis(BSplineBasis(knotVectors, basisDegrees)),
       coefficients(coefficients),
-      knotaverages(computeKnotAverages())
+      knotaverages(computeKnotAverages(basis))
 {
     setCoefficients(coefficients);
 
@@ -238,54 +286,6 @@ void BSpline::decomposeToBezierForm()
     updateControlPoints(A);
 }
 
-// Computes knot averages: assumes that basis is initialized!
-DenseMatrix BSpline::computeKnotAverages() const
-{
-    // Calculate knot averages for each knot vector
-    std::vector<DenseVector> mu_vectors;
-    for (unsigned int i = 0; i < getNumVariables(); i++)
-    {
-        std::vector<double> knots = basis.getKnotVector(i);
-        DenseVector mu = DenseVector::Zero(basis.getNumBasisFunctions(i));
-
-        for (unsigned int j = 0; j < basis.getNumBasisFunctions(i); j++)
-        {
-            double knotAvg = 0;
-            for (unsigned int k = j+1; k <= j+basis.getBasisDegree(i); k++)
-            {
-                knotAvg += knots.at(k);
-            }
-            mu(j) = knotAvg/basis.getBasisDegree(i);
-        }
-        mu_vectors.push_back(mu);
-    }
-
-    // Calculate vectors of ones (with same length as corresponding knot average vector)
-    std::vector<DenseVector> knotOnes;
-    for (unsigned int i = 0; i < getNumVariables(); i++)
-        knotOnes.push_back(DenseVector::Ones(mu_vectors.at(i).rows()));
-
-    // Fill knot average matrix one column at the time
-    DenseMatrix knot_averages = DenseMatrix::Zero(basis.getNumBasisFunctions(), getNumVariables());
-
-    for (unsigned int i = 0; i < getNumVariables(); i++)
-    {
-        DenseMatrix mu_ext(1,1); mu_ext(0,0) = 1;
-        for (unsigned int j = 0; j < getNumVariables(); j++)
-        {
-            DenseMatrix temp = mu_ext;
-            if (i == j)
-                mu_ext = Eigen::kroneckerProduct(temp, mu_vectors.at(j));
-            else
-                mu_ext = Eigen::kroneckerProduct(temp, knotOnes.at(j));
-        }
-        if (mu_ext.rows() != basis.getNumBasisFunctions())
-            throw Exception("BSpline::computeKnotAverages: Incompatible size of knot average matrix.");
-        knot_averages.block(0, i, basis.getNumBasisFunctions(), 1) = mu_ext;
-    }
-
-    return knot_averages;
-}
 
 void BSpline::insertKnots(double tau, unsigned int dim, unsigned int multiplicity)
 {

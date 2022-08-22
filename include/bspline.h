@@ -141,9 +141,6 @@ private:
     DenseVector coefficients;
     DenseMatrix knotaverages;
 
-    // Control point computations
-    DenseMatrix computeKnotAverages() const;
-
     // Evaluation of B-spline basis functions
     template <class x_type>
     auto evalBasis(x_type const& x) const
