@@ -34,8 +34,7 @@ public:
     /**
      * Construct B-spline from knot vectors, coefficients, and basis degrees
      */
-    BSpline(std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
-    BSpline(DenseVector coefficients, std::vector< std::vector<double> > knotVectors, std::vector<unsigned int> basisDegrees);
+    BSpline(DenseVector coefficients, BSplineBasis);
 
     template <class x_type>
     double eval(x_type const& x) const
@@ -93,7 +92,6 @@ public:
     /**
      * Setters
      */
-    void setCoefficients(const DenseVector &coefficients);
 
     // Linear transformation of control points (B-spline has affine invariance)
     void updateControlPoints(const DenseMatrix &A);
