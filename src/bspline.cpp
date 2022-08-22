@@ -23,7 +23,6 @@ namespace SPLINTER {
 BSpline::BSpline(
     std::vector<std::vector<double>> knotVectors,
     std::vector<unsigned int> basisDegrees) :
-    numVariables(knotVectors.size()),
     basis(BSplineBasis(knotVectors, basisDegrees)),
     coefficients(DenseVector::Zero(1)),
     knotaverages(computeKnotAverages()) {
@@ -37,7 +36,6 @@ BSpline::BSpline(
     DenseVector coefficients,
     std::vector<std::vector<double>> knotVectors,
     std::vector<unsigned int> basisDegrees) :
-    numVariables(knotVectors.size()),
     basis(BSplineBasis(knotVectors, basisDegrees)),
     coefficients(coefficients),
     knotaverages(computeKnotAverages()) {
@@ -47,7 +45,7 @@ BSpline::BSpline(
 }
 
 /**
- * Returns the (1 x numVariables) Jacobian evaluated at x
+ * Returns the (1 x getNumVariables()) Jacobian evaluated at x
  */
 DenseMatrix BSpline::evalJacobian(DenseVector x) const {
     checkInput(x);
@@ -70,14 +68,15 @@ DenseMatrix BSpline::evalHessian(DenseVector x) const {
 
     DenseMatrix H;
     H.setZero(1, 1);
-    DenseMatrix identity = DenseMatrix::Identity(numVariables, numVariables);
-    DenseMatrix caug     = kroneckerProduct(identity, coefficients.transpose());
-    DenseMatrix DB       = basis.evalBasisHessian(x);
-    H                    = caug * DB;
+    DenseMatrix identity =
+        DenseMatrix::Identity(getNumVariables(), getNumVariables());
+    DenseMatrix caug = kroneckerProduct(identity, coefficients.transpose());
+    DenseMatrix DB   = basis.evalBasisHessian(x);
+    H                = caug * DB;
 
     // Fill in upper triangular of Hessian
-    for (size_t i = 0; i < numVariables; ++i)
-        for (size_t j = i + 1; j < numVariables; ++j)
+    for (size_t i = 0; i < getNumVariables(); ++i)
+        for (size_t j = i + 1; j < getNumVariables(); ++j)
             H(i, j) = H(j, i);
 
     return H;
@@ -100,7 +99,7 @@ SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
 
 std::vector<unsigned int> BSpline::getNumBasisFunctionsPerVariable() const {
     std::vector<unsigned int> ret;
-    for (unsigned int i = 0; i < numVariables; i++)
+    for (unsigned int i = 0; i < getNumVariables(); i++)
         ret.push_back(basis.getNumBasisFunctions(i));
     return ret;
 }
@@ -123,10 +122,10 @@ std::vector<double> BSpline::getDomainLowerBound() const {
 
 DenseMatrix BSpline::getControlPoints() const {
     int nc = coefficients.size();
-    DenseMatrix controlPoints(nc, numVariables + 1);
+    DenseMatrix controlPoints(nc, getNumVariables() + 1);
 
-    controlPoints.block(0, 0, nc, numVariables) = knotaverages;
-    controlPoints.block(0, numVariables, nc, 1) = coefficients;
+    controlPoints.block(0, 0, nc, getNumVariables()) = knotaverages;
+    controlPoints.block(0, getNumVariables(), nc, 1) = coefficients;
 
     return controlPoints;
 }
@@ -141,14 +140,14 @@ void BSpline::setCoefficients(DenseVector const& coefficients) {
 }
 
 void BSpline::setControlPoints(DenseMatrix const& controlPoints) {
-    if (controlPoints.cols() != numVariables + 1)
+    if (controlPoints.cols() != getNumVariables() + 1)
         throw Exception(
             "BSpline::setControlPoints: Incompatible size of control point matrix.");
 
     int nc = controlPoints.rows();
 
-    knotaverages = controlPoints.block(0, 0, nc, numVariables);
-    coefficients = controlPoints.block(0, numVariables, nc, 1);
+    knotaverages = controlPoints.block(0, 0, nc, getNumVariables());
+    coefficients = controlPoints.block(0, getNumVariables(), nc, 1);
 
     checkControlPoints();
 }
@@ -165,7 +164,7 @@ void BSpline::checkControlPoints() const {
     if (coefficients.rows() != knotaverages.rows())
         throw Exception(
             "BSpline::checkControlPoints: Inconsistent size of coefficients and knot averages matrices.");
-    if (knotaverages.cols() != numVariables)
+    if (knotaverages.cols() != getNumVariables())
         throw Exception(
             "BSpline::checkControlPoints: Inconsistent size of knot averages matrix.");
 }
@@ -178,13 +177,13 @@ void BSpline::reduceSupport(
     std::vector<double> lb,
     std::vector<double> ub,
     bool doRegularizeKnotVectors) {
-    if (lb.size() != numVariables || ub.size() != numVariables)
+    if (lb.size() != getNumVariables() || ub.size() != getNumVariables())
         throw Exception("BSpline::reduceSupport: Inconsistent vector sizes!");
 
     std::vector<double> sl = basis.getSupportLowerBound();
     std::vector<double> su = basis.getSupportUpperBound();
 
-    for (unsigned int dim = 0; dim < numVariables; dim++) {
+    for (unsigned int dim = 0; dim < getNumVariables(); dim++) {
         // Check if new domain is empty
         if (ub.at(dim) <= lb.at(dim) || lb.at(dim) >= su.at(dim) ||
             ub.at(dim) <= sl.at(dim))
@@ -240,7 +239,7 @@ void BSpline::decomposeToBezierForm() {
 DenseMatrix BSpline::computeKnotAverages() const {
     // Calculate knot averages for each knot vector
     std::vector<DenseVector> mu_vectors;
-    for (unsigned int i = 0; i < numVariables; i++) {
+    for (unsigned int i = 0; i < getNumVariables(); i++) {
         std::vector<double> knots = basis.getKnotVector(i);
         DenseVector mu = DenseVector::Zero(basis.getNumBasisFunctions(i));
 
@@ -257,17 +256,17 @@ DenseMatrix BSpline::computeKnotAverages() const {
 
     // Calculate vectors of ones (with same length as corresponding knot average vector)
     std::vector<DenseVector> knotOnes;
-    for (unsigned int i = 0; i < numVariables; i++)
+    for (unsigned int i = 0; i < getNumVariables(); i++)
         knotOnes.push_back(DenseVector::Ones(mu_vectors.at(i).rows()));
 
     // Fill knot average matrix one column at the time
     DenseMatrix knot_averages =
-        DenseMatrix::Zero(basis.getNumBasisFunctions(), numVariables);
+        DenseMatrix::Zero(basis.getNumBasisFunctions(), getNumVariables());
 
-    for (unsigned int i = 0; i < numVariables; i++) {
+    for (unsigned int i = 0; i < getNumVariables(); i++) {
         DenseMatrix mu_ext(1, 1);
         mu_ext(0, 0) = 1;
-        for (unsigned int j = 0; j < numVariables; j++) {
+        for (unsigned int j = 0; j < getNumVariables(); j++) {
             DenseMatrix temp = mu_ext;
             if (i == j)
                 mu_ext = Eigen::kroneckerProduct(temp, mu_vectors.at(j));
@@ -295,11 +294,11 @@ void BSpline::insertKnots(
 void BSpline::regularizeKnotVectors(
     std::vector<double>& lb, std::vector<double>& ub) {
     // Add and remove controlpoints and knots to make the b-spline p-regular with support [lb, ub]
-    if (!(lb.size() == numVariables && ub.size() == numVariables))
+    if (!(lb.size() == getNumVariables() && ub.size() == getNumVariables()))
         throw Exception(
             "BSpline::regularizeKnotVectors: Inconsistent vector sizes.");
 
-    for (unsigned int dim = 0; dim < numVariables; dim++) {
+    for (unsigned int dim = 0; dim < getNumVariables(); dim++) {
         unsigned int multiplicityTarget = basis.getBasisDegree(dim) + 1;
 
         // Inserting many knots at the time (to save number of B-spline coefficient calculations)
@@ -324,7 +323,7 @@ void BSpline::regularizeKnotVectors(
 
 bool BSpline::removeUnsupportedBasisFunctions(
     std::vector<double>& lb, std::vector<double>& ub) {
-    if (lb.size() != numVariables || ub.size() != numVariables)
+    if (lb.size() != getNumVariables() || ub.size() != getNumVariables())
         throw Exception(
             "BSpline::removeUnsupportedBasisFunctions: Incompatible dimension of domain bounds.");
 
