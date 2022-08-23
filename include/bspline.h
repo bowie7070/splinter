@@ -47,7 +47,7 @@ public:
 
     template <class x_type>
     void checkInput(x_type const& x) const {
-        assert(x.size() == numVariables);
+        assert(x.size() == getNumVariables());
     }
 
     template <class x_type>
