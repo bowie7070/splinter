@@ -7,35 +7,32 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <function.h>
 #include "utilities.h"
+#include <function.h>
 
-namespace SPLINTER
-{
+namespace SPLINTER {
 
-double Function::eval(const std::vector<double> &x) const
-{
+double Function::eval(const std::vector<double>& x) const {
     auto denseX = vectorToDenseVector(x);
 
     return eval(denseX);
 }
 
-std::vector<double> Function::evalJacobian(const std::vector<double> &x) const
-{
+std::vector<double> Function::evalJacobian(const std::vector<double>& x) const {
     auto denseX = vectorToDenseVector(x);
 
     return denseVectorToVector(evalJacobian(denseX));
 }
 
-std::vector<std::vector<double>> Function::evalHessian(const std::vector<double> &x) const
-{
+std::vector<std::vector<double>>
+Function::evalHessian(const std::vector<double>& x) const {
     auto denseX = vectorToDenseVector(x);
 
     return denseMatrixToVectorVector(secondOrderCentralDifference(denseX));
 }
 
-std::vector<double> Function::centralDifference(const std::vector<double> &x) const
-{
+std::vector<double>
+Function::centralDifference(const std::vector<double>& x) const {
     auto denseX = vectorToDenseVector(x);
 
     auto dx = centralDifference(denseX);
@@ -43,8 +40,8 @@ std::vector<double> Function::centralDifference(const std::vector<double> &x) co
     return denseVectorToVector(dx);
 }
 
-std::vector<std::vector<double>> Function::secondOrderCentralDifference(const std::vector<double> &x) const
-{
+std::vector<std::vector<double>>
+Function::secondOrderCentralDifference(const std::vector<double>& x) const {
     auto denseX = vectorToDenseVector(x);
 
     DenseMatrix ddx = secondOrderCentralDifference(denseX);
@@ -52,13 +49,11 @@ std::vector<std::vector<double>> Function::secondOrderCentralDifference(const st
     return denseMatrixToVectorVector(ddx);
 }
 
-DenseMatrix Function::evalJacobian(DenseVector x) const
-{
+DenseMatrix Function::evalJacobian(DenseVector x) const {
     return centralDifference(x);
 }
 
-DenseMatrix Function::evalHessian(DenseVector x) const
-{
+DenseMatrix Function::evalHessian(DenseVector x) const {
     auto vec = denseVectorToVector(x);
 
     auto hessian = evalHessian(vec);
@@ -66,43 +61,38 @@ DenseMatrix Function::evalHessian(DenseVector x) const
     return vectorVectorToDenseMatrix(hessian);
 }
 
-DenseMatrix Function::centralDifference(DenseVector x) const
-{
+DenseMatrix Function::centralDifference(DenseVector x) const {
     DenseMatrix dx(1, x.size());
 
-    double h = 1e-6; // perturbation step size
-    double hForward = 0.5*h;
-    double hBackward = 0.5*h;
+    double h         = 1e-6; // perturbation step size
+    double hForward  = 0.5 * h;
+    double hBackward = 0.5 * h;
 
-    for (unsigned int i = 0; i < getNumVariables(); ++i)
-    {
+    for (unsigned int i = 0; i < getNumVariables(); ++i) {
         DenseVector xForward(x);
         xForward(i) = xForward(i) + hForward;
 
         DenseVector xBackward(x);
         xBackward(i) = xBackward(i) - hBackward;
 
-        double yForward = eval(xForward);
+        double yForward  = eval(xForward);
         double yBackward = eval(xBackward);
 
-        dx(i) = (yForward - yBackward)/(hBackward + hForward);
+        dx(i) = (yForward - yBackward) / (hBackward + hForward);
     }
 
     return dx;
 }
 
-DenseMatrix Function::secondOrderCentralDifference(DenseVector x) const
-{
+DenseMatrix Function::secondOrderCentralDifference(DenseVector x) const {
     DenseMatrix ddx(getNumVariables(), getNumVariables());
 
-    double h = 1e-6; // perturbation step size
-    double hForward = 0.5*h;
-    double hBackward = 0.5*h;
+    double h         = 1e-6; // perturbation step size
+    double hForward  = 0.5 * h;
+    double hBackward = 0.5 * h;
 
-    for (size_t i = 0; i < getNumVariables(); ++i)
-    {
-        for (size_t j = 0; j < getNumVariables(); ++j)
-        {
+    for (size_t i = 0; i < getNumVariables(); ++i) {
+        for (size_t j = 0; j < getNumVariables(); ++j) {
             DenseVector x0(x);
             DenseVector x1(x);
             DenseVector x2(x);

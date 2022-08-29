@@ -13,8 +13,7 @@
 #include "definitions.h"
 #include "saveable.h"
 
-namespace SPLINTER
-{
+namespace SPLINTER {
 
 /*
  * Interface for functions
@@ -22,14 +21,11 @@ namespace SPLINTER
  * Default implementations of jacobian and hessian evaluation is using central difference.
  * TODO: Remove current requirement that all functions must implement save and load!
  */
-class SPLINTER_API Function : public Saveable
-{
+class SPLINTER_API Function : public Saveable {
 public:
-    Function()
-        : Function(1) {}
+    Function() : Function(1) {}
 
-    Function(unsigned int numVariables)
-        : numVariables(numVariables) {}
+    Function(unsigned int numVariables) : numVariables(numVariables) {}
 
     virtual ~Function() {}
 
@@ -41,7 +37,7 @@ public:
     /**
      * Returns the function value at x
      */
-    double eval(const std::vector<double> &x) const;
+    double eval(const std::vector<double>& x) const;
 
     /**
      * Returns the (1 x numVariables) Jacobian evaluated at x
@@ -51,7 +47,7 @@ public:
     /**
      * Returns the (1 x numVariables) Jacobian evaluated at x
      */
-    std::vector<double> evalJacobian(const std::vector<double> &x) const;
+    std::vector<double> evalJacobian(const std::vector<double>& x) const;
 
     /**
      * Returns the (numVariables x numVariables) Hessian evaluated at x
@@ -61,41 +57,38 @@ public:
     /**
      * Returns the (numVariables x numVariables) Hessian evaluated at x
      */
-    std::vector<std::vector<double>> evalHessian(const std::vector<double> &x) const;
+    std::vector<std::vector<double>>
+    evalHessian(const std::vector<double>& x) const;
 
     /**
      * Get the dimension
      */
-    inline unsigned int getNumVariables() const
-    {
-        return numVariables;
-    }
+    inline unsigned int getNumVariables() const { return numVariables; }
 
     /**
      * Check input
      */
     void checkInput(DenseVector x) const {
         if (x.size() != numVariables)
-            throw Exception("Function::checkInput: Wrong dimension on evaluation point x.");
+            throw Exception(
+                "Function::checkInput: Wrong dimension on evaluation point x.");
     }
 
     /**
      * Returns the central difference at x
      * Vector of numVariables length
      */
-    std::vector<double> centralDifference(const std::vector<double> &x) const;
+    std::vector<double> centralDifference(const std::vector<double>& x) const;
     DenseMatrix centralDifference(DenseVector x) const;
 
-    std::vector<std::vector<double>> secondOrderCentralDifference(const std::vector<double> &x) const;
+    std::vector<std::vector<double>>
+    secondOrderCentralDifference(const std::vector<double>& x) const;
     DenseMatrix secondOrderCentralDifference(DenseVector x) const;
 
     /**
      * Description of function.
      */
-    virtual std::string getDescription() const
-    {
-        return "";
-    }
+    virtual std::string getDescription() const { return ""; }
 
 protected:
     unsigned int numVariables; // Dimension of domain (size of x)

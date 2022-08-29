@@ -12,22 +12,21 @@
 
 #include "definitions.h"
 
-namespace SPLINTER
-{
+namespace SPLINTER {
 
 /*
  * DataPoint is a class representing a data point (x, y),
  * where y is the value obtained by sampling at a point x.
  * Note that x is a vector and y is a scalar.
  */
-class DataPoint
-{
+class DataPoint {
 public:
     DataPoint(double x, double y);
     DataPoint(std::vector<double> x, double y);
     DataPoint(DenseVector x, double y);
 
-    bool operator<(const DataPoint &rhs) const; // Returns false if the two are equal
+    bool
+    operator<(const DataPoint& rhs) const; // Returns false if the two are equal
 
     std::vector<double> getX() const { return x; }
     double getY() const { return y; }
@@ -38,7 +37,7 @@ private:
 
     std::vector<double> x;
     double y;
-    void setData(const std::vector<double> &x, double y);
+    void setData(const std::vector<double>& x, double y);
 
     friend class Serializer;
 };

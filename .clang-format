@@ -1,0 +1,23 @@
+AccessModifierOffset: -4
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveDeclarations: false
+AlignConsecutiveAssignments: true
+AllowAllArgumentsOnNextLine: false
+AllowAllConstructorInitializersOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BreakConstructorInitializers: AfterColon
+BreakStringLiterals: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+IncludeBlocks: Merge
+IndentWidth: 4
+PointerAlignment: Left
+ReflowComments: false
+TabWidth: 4
+UseTab: Never

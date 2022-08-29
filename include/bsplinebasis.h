@@ -10,34 +10,36 @@
 #ifndef SPLINTER_BSPLINEBASIS_H
 #define SPLINTER_BSPLINEBASIS_H
 
-#include "definitions.h"
 #include "bsplinebasis1d.h"
+#include "definitions.h"
 
-namespace SPLINTER
-{
+namespace SPLINTER {
 
-class BSplineBasis
-{
+class BSplineBasis {
 public:
     BSplineBasis();
-    BSplineBasis(std::vector<std::vector<double>> &knotVectors, std::vector<unsigned int> basisDegrees);
+    BSplineBasis(
+        std::vector<std::vector<double>>& knotVectors,
+        std::vector<unsigned int> basisDegrees);
 
     // Evaluation
-    SparseVector eval(const DenseVector &x) const;
-    DenseMatrix evalBasisJacobianOld(DenseVector &x) const; // Depricated
-    SparseMatrix evalBasisJacobian(DenseVector &x) const;
-    SparseMatrix evalBasisJacobian2(DenseVector &x) const; // A bit slower than evaBasisJacobianOld()
-    SparseMatrix evalBasisHessian(DenseVector &x) const;
+    SparseVector eval(const DenseVector& x) const;
+    DenseMatrix evalBasisJacobianOld(DenseVector& x) const; // Depricated
+    SparseMatrix evalBasisJacobian(DenseVector& x) const;
+    SparseMatrix evalBasisJacobian2(
+        DenseVector& x) const; // A bit slower than evaBasisJacobianOld()
+    SparseMatrix evalBasisHessian(DenseVector& x) const;
 
     // Knot vector manipulation
     SparseMatrix refineKnots();
     SparseMatrix refineKnotsLocally(DenseVector x);
     SparseMatrix decomposeToBezierForm();
-    SparseMatrix insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
+    SparseMatrix
+    insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
     // Getters
     BSplineBasis1D getSingleBasis(int dim);
-    std::vector< std::vector<double> > getKnotVectors() const;
+    std::vector<std::vector<double>> getKnotVectors() const;
     std::vector<double> getKnotVector(int dim) const;
 
     std::vector<unsigned int> getBasisDegrees() const;
@@ -52,19 +54,20 @@ public:
 
     int supportedPrInterval() const;
 
-    bool insideSupport(DenseVector &x) const;
+    bool insideSupport(DenseVector& x) const;
     std::vector<double> getSupportLowerBound() const;
     std::vector<double> getSupportUpperBound() const;
 
     // Support related
-    SparseMatrix reduceSupport(std::vector<double>& lb, std::vector<double>& ub);
+    SparseMatrix
+    reduceSupport(std::vector<double>& lb, std::vector<double>& ub);
 
 private:
     std::vector<BSplineBasis1D> bases;
     unsigned int numVariables;
 
     friend class Serializer;
-    friend bool operator==(const BSplineBasis &lhs, const BSplineBasis &rhs);
+    friend bool operator==(const BSplineBasis& lhs, const BSplineBasis& rhs);
 };
 
 } // namespace SPLINTER

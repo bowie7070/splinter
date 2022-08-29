@@ -10,18 +10,15 @@
 #include "cinterface/cinterface.h"
 #include "cinterface/utilities.h"
 
-extern "C"
-{
+extern "C" {
 
-int splinter_get_error()
-{
+int splinter_get_error() {
     int temp = SPLINTER::splinter_last_func_call_error;
     SPLINTER::splinter_last_func_call_error = 0;
     return temp;
 }
 
-const char *splinter_get_error_string()
-{
+const char* splinter_get_error_string() {
     return SPLINTER::splinter_error_string;
 }
 
