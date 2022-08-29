@@ -11,6 +11,7 @@
 #define SPLINTER_BSPLINEBASIS_H
 
 #include "bsplinebasis1d.h"
+#include "definitions.h"
 #include "mykroneckerproduct.h"
 #include <unsupported/Eigen/KroneckerProduct>
 
@@ -28,13 +29,15 @@ public:
         if constexpr (std::is_floating_point_v<x_type>) {
             return bases[0].eval(x);
         } else {
-            // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
-            std::vector<SparseVector> basisFunctionValues;
+            assert(!bases.empty());
 
-            for (int var = 0; var < x.size(); var++)
-                basisFunctionValues.push_back(bases[var].eval(x[var]));
+            SparseVector product = bases[0].eval(x[0]);
 
-            return kroneckerProductVectors(basisFunctionValues);
+            for (int i = 1, I = getNumVariables(); i < I; ++i) {
+                product = kroneckerProduct(product, bases[i].eval(x[i])).eval();
+            }
+
+            return product;
         }
     }
 
