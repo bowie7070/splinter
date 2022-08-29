@@ -46,7 +46,33 @@ public:
     unsigned int getNumBasisFunctionsTarget() const;
 
     // Index getters
-    std::vector<int> indexSupportedBasisfunctions(double x) const;
+
+    struct first_last {
+        int first;
+        int last;
+    };
+
+    first_last _indexSupportedBasisfunctions(double x) const {
+        assert(insideSupport(x));
+
+        int last = indexHalfopenInterval(x);
+        if (last < 0) {
+            // NOTE: can this happen?
+            last = knots.size() - 1 - (degree + 1);
+        }
+        int first = std::max((int)(last - degree), 0);
+        return {first, last};
+    }
+
+    template <class callable>
+    void indexSupportedBasisfunctions(double x, callable f) const {
+        if (insideSupport(x)) {
+            auto const [first, last] = _indexSupportedBasisfunctions(x);
+
+            f(first, last);
+        }
+    }
+
     int indexHalfopenInterval(double x) const;
     unsigned int indexLongestInterval() const;
     unsigned int indexLongestInterval(std::vector<double> const& vec) const;

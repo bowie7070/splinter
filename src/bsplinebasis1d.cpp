@@ -37,16 +37,16 @@ SparseVector BSplineBasis1D::eval(double x) const {
 
     supportHack(x);
 
-    std::vector<int> indexSupported = indexSupportedBasisfunctions(x);
-
-    values.reserve(indexSupported.size());
-
     // Evaluate nonzero basis functions
-    for (auto it = indexSupported.begin(); it != indexSupported.end(); ++it) {
-        double val = deBoorCox(x, *it, degree);
-        if (fabs(val) > 1e-12)
-            values.insert(*it) = val;
-    }
+    indexSupportedBasisfunctions(x, [&](int const first, int const last) {
+        values.reserve(last - first + 1);
+        for (int i = first; i <= last; ++i) {
+            double const val = deBoorCox(x, i, degree);
+            if (fabs(val) > 1e-12) {
+                values.insert(i) = val;
+            }
+        }
+    });
 
     // Alternative evaluation using basis matrix
     //    int knotIndex = indexHalfopenInterval(x); // knot index
@@ -123,24 +123,26 @@ SparseVector BSplineBasis1D::evalFirstDerivative(double x) const {
 
     supportHack(x);
 
-    std::vector<int> supportedBasisFunctions = indexSupportedBasisfunctions(x);
+    indexSupportedBasisfunctions(x, [&](int const first, int const last) {
+        values.reserve(last - first + 1);
 
-    for (int i : supportedBasisFunctions) {
-        // Differentiate basis function
-        // Equation 3.35 in Lyche & Moerken (2011)
-        double b1 = deBoorCox(x, i, degree - 1);
-        double b2 = deBoorCox(x, i + 1, degree - 1);
+        for (int i = first; i <= last; ++i) {
+            // Differentiate basis function
+            // Equation 3.35 in Lyche & Moerken (2011)
+            double b1 = deBoorCox(x, i, degree - 1);
+            double b2 = deBoorCox(x, i + 1, degree - 1);
 
-        double t11 = knots.at(i);
-        double t12 = knots.at(i + degree);
-        double t21 = knots.at(i + 1);
-        double t22 = knots.at(i + degree + 1);
+            double t11 = knots.at(i);
+            double t12 = knots.at(i + degree);
+            double t21 = knots.at(i + 1);
+            double t22 = knots.at(i + degree + 1);
 
-        (t12 == t11) ? b1 = 0 : b1 = b1 / (t12 - t11);
-        (t22 == t21) ? b2 = 0 : b2 = b2 / (t22 - t21);
+            (t12 == t11) ? b1 = 0 : b1 = b1 / (t12 - t11);
+            (t22 == t21) ? b2 = 0 : b2 = b2 / (t22 - t21);
 
-        values.insert(i) = degree * (b1 - b2);
-    }
+            values.insert(i) = degree * (b1 - b2);
+        }
+    });
 
     return values;
 }
@@ -449,8 +451,8 @@ SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
 
     unsigned int k = degree + 1;
 
-    int index_lower = indexSupportedBasisfunctions(lb).front();
-    int index_upper = indexSupportedBasisfunctions(ub).back();
+    int index_lower = _indexSupportedBasisfunctions(lb).first;
+    int index_upper = _indexSupportedBasisfunctions(ub).last;
 
     // Check lower bound index
     if (k != knotMultiplicity(knots.at(index_lower))) {
@@ -517,23 +519,6 @@ unsigned int BSplineBasis1D::getNumBasisFunctions() const {
 
 unsigned int BSplineBasis1D::getNumBasisFunctionsTarget() const {
     return targetNumBasisfunctions;
-}
-
-// Return indices of supporting basis functions at x
-std::vector<int> BSplineBasis1D::indexSupportedBasisfunctions(double x) const {
-    std::vector<int> ret;
-    if (insideSupport(x)) {
-        int last = indexHalfopenInterval(x);
-        if (last < 0) {
-            // NOTE: can this happen?
-            last = knots.size() - 1 - (degree + 1);
-        }
-        int first = std::max((int)(last - degree), 0);
-        for (int i = first; i <= last; i++) {
-            ret.push_back(i);
-        }
-    }
-    return ret;
 }
 
 unsigned int BSplineBasis1D::indexLongestInterval() const {
