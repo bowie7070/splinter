@@ -73,9 +73,9 @@ std::vector<double> knotVectorMovingAverage(
     for (unsigned int i = 0; i < n - k - 2; ++i) {
         double ma = 0;
         for (unsigned int j = 0; j < w; ++j)
-            ma += unique.at(i + j);
+            ma += unique[i + j];
 
-        knots.at(i) = ma / w;
+        knots[i] = ma / w;
     }
 
     // Repeat first knot p + 1 times (for interpolation of start point)
@@ -187,7 +187,7 @@ std::vector<double> knotVectorBuckets(
 
     // Add residual
     for (unsigned int i = 0; i < res; ++i)
-        windows.at(i) += 1;
+        windows[i] += 1;
 
     // Compute internal knots
     std::vector<double> knots(ni, 0);
@@ -195,11 +195,11 @@ std::vector<double> knotVectorBuckets(
     // Compute (n-k-2) interior knots using moving average
     unsigned int index = 0;
     for (unsigned int i = 0; i < ni; ++i) {
-        for (unsigned int j = 0; j < windows.at(i); ++j) {
-            knots.at(i) += unique.at(index + j);
+        for (unsigned int j = 0; j < windows[i]; ++j) {
+            knots[i] += unique[index + j];
         }
-        knots.at(i) /= windows.at(i);
-        index += windows.at(i);
+        knots[i] /= windows[i];
+        index += windows[i];
     }
 
     // Repeat first knot p + 1 times (for interpolation of start point)

@@ -132,10 +132,10 @@ SparseVector BSplineBasis1D::evalFirstDerivative(double x) const {
             double b1 = deBoorCox(x, i, degree - 1);
             double b2 = deBoorCox(x, i + 1, degree - 1);
 
-            double t11 = knots.at(i);
-            double t12 = knots.at(i + degree);
-            double t21 = knots.at(i + 1);
-            double t22 = knots.at(i + degree + 1);
+            double t11 = knots[i];
+            double t12 = knots[i + degree];
+            double t21 = knots[i + 1];
+            double t22 = knots[i + degree + 1];
 
             (t12 == t11) ? b1 = 0 : b1 = b1 / (t12 - t11);
             (t22 == t21) ? b2 = 0 : b2 = b2 / (t22 - t21);
@@ -170,7 +170,7 @@ SparseMatrix BSplineBasis1D::buildBasisMatrix(
     R.reserve(Eigen::VectorXi::Constant(cols, 2));
 
     for (unsigned int i = 0; i < rows; i++) {
-        double dk = knots.at(u + 1 + i) - knots.at(u + 1 + i - k);
+        double dk = knots[u + 1 + i] - knots[u + 1 + i - k];
         if (dk == 0) {
             continue;
         } else {
@@ -182,12 +182,12 @@ SparseMatrix BSplineBasis1D::buildBasisMatrix(
                 R.insert(i, i + 1) = 1 / dk;
             } else {
                 // Insert diagonal element
-                double a = (knots.at(u + 1 + i) - x) / dk;
+                double a = (knots[u + 1 + i] - x) / dk;
                 if (a != 0)
                     R.insert(i, i) = a;
 
                 // Insert super-diagonal element
-                double b = (x - knots.at(u + 1 + i - k)) / dk;
+                double b = (x - knots[u + 1 + i - k]) / dk;
                 if (b != 0)
                     R.insert(i, i + 1) = b;
             }
@@ -201,15 +201,15 @@ SparseMatrix BSplineBasis1D::buildBasisMatrix(
 
 double BSplineBasis1D::deBoorCox(double x, int i, int k) const {
     if (k == 0) {
-        if (inHalfopenInterval(x, knots.at(i), knots.at(i + 1)))
+        if (inHalfopenInterval(x, knots[i], knots[i + 1]))
             return 1;
         else
             return 0;
     } else {
         double s1, s2, r1, r2;
 
-        s1 = deBoorCoxCoeff(x, knots.at(i), knots.at(i + k));
-        s2 = deBoorCoxCoeff(x, knots.at(i + 1), knots.at(i + k + 1));
+        s1 = deBoorCoxCoeff(x, knots[i], knots[i + k]);
+        s2 = deBoorCoxCoeff(x, knots[i + 1], knots[i + k + 1]);
 
         r1 = deBoorCox(x, i, k - 1);
         r2 = deBoorCox(x, i + 1, k - 1);
@@ -260,9 +260,8 @@ SparseMatrix BSplineBasis1D::refineKnots() {
 
     unsigned int targetNumKnots = targetNumBasisfunctions + degree + 1;
     while (refinedKnots.size() < targetNumKnots) {
-        int index = indexLongestInterval(refinedKnots);
-        double newKnot =
-            (refinedKnots.at(index) + refinedKnots.at(index + 1)) / 2.0;
+        int index      = indexLongestInterval(refinedKnots);
+        double newKnot = (refinedKnots[index] + refinedKnots[index + 1]) / 2.0;
         refinedKnots.insert(
             std::lower_bound(refinedKnots.begin(), refinedKnots.end(), newKnot),
             newKnot);
@@ -385,14 +384,14 @@ SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
 
     // Build A row-by-row
     for (unsigned int i = 0; i < m; i++) {
-        int u = indexHalfopenInterval(knotsAug.at(i));
+        int u = indexHalfopenInterval(knotsAug[i]);
 
         SparseMatrix R(1, 1);
         R.insert(0, 0) = 1;
 
         // For p > 0
         for (unsigned int j = 1; j <= degree; j++) {
-            SparseMatrix Ri = buildBasisMatrix(knotsAug.at(i + j), u, j);
+            SparseMatrix Ri = buildBasisMatrix(knotsAug[i + j], u, j);
             R               = R * Ri;
         }
 
@@ -426,7 +425,7 @@ void BSplineBasis1D::supportHack(double& x) const {
 }
 
 /*
- * Finds index i such that knots.at(i) <= x < knots.at(i+1).
+ * Finds index i such that knots[i] <= x < knots[i+1].
  * Returns false if x is outside support.
  */
 int BSplineBasis1D::indexHalfopenInterval(double x) const {
@@ -455,7 +454,7 @@ SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     int index_upper = _indexSupportedBasisfunctions(ub).last;
 
     // Check lower bound index
-    if (k != knotMultiplicity(knots.at(index_lower))) {
+    if (k != knotMultiplicity(knots[index_lower])) {
         int suggested_index = index_lower - 1;
         if (0 <= suggested_index) {
             index_lower = suggested_index;
@@ -466,7 +465,7 @@ SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     }
 
     // Check upper bound index
-    if (knotMultiplicity(ub) == k && knots.at(index_upper) == ub) {
+    if (knotMultiplicity(ub) == k && knots[index_upper] == ub) {
         index_upper -= k;
     }
 
@@ -497,7 +496,7 @@ SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
 }
 
 double BSplineBasis1D::getKnotValue(unsigned int index) const {
-    return knots.at(index);
+    return knots[index];
 }
 
 unsigned int BSplineBasis1D::knotMultiplicity(double tau) const {
@@ -532,7 +531,7 @@ BSplineBasis1D::indexLongestInterval(std::vector<double> const& vec) const {
     unsigned int index = 0;
 
     for (unsigned int i = 0; i < vec.size() - 1; i++) {
-        interval = vec.at(i + 1) - vec.at(i);
+        interval = vec[i + 1] - vec[i];
         if (longest < interval) {
             longest = interval;
             index   = i;

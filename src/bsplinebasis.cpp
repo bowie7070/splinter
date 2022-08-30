@@ -23,13 +23,13 @@ BSplineBasis::BSplineBasis(
     // Set univariate bases
     bases.clear();
     for (unsigned int i = 0; i < numVariables; i++) {
-        bases.push_back(BSplineBasis1D(knotVectors.at(i), basisDegrees.at(i)));
+        bases.push_back(BSplineBasis1D(knotVectors[i], basisDegrees[i]));
 
         // Adjust target number of basis functions used in e.g. refinement
         if (numVariables > 2) {
             // One extra knot is allowed
-            bases.at(i).setNumBasisFunctionsTarget(
-                (basisDegrees.at(i) + 1) + 1); // Minimum degree+1
+            bases[i].setNumBasisFunctionsTarget(
+                (basisDegrees[i] + 1) + 1); // Minimum degree+1
         }
     }
 }
@@ -50,10 +50,10 @@ DenseMatrix BSplineBasis::evalBasisJacobianOld(DenseVector& x) const {
             DenseVector xi;
             if (j == i) {
                 // Differentiated basis
-                xi = bases.at(j).evalFirstDerivative(x(j));
+                xi = bases[j].evalFirstDerivative(x(j));
             } else {
                 // Normal basis
-                xi = bases.at(j).eval(x(j));
+                xi = bases[j].eval(x(j));
             }
 
             bi = kroneckerProduct(temp, xi);
@@ -80,10 +80,10 @@ SparseMatrix BSplineBasis::evalBasisJacobian(DenseVector& x) const {
         for (unsigned int j = 0; j < numVariables; ++j) {
             if (j == i) {
                 // Differentiated basis
-                values.at(j) = bases.at(j).evalDerivative(x(j), 1);
+                values[j] = bases[j].evalDerivative(x(j), 1);
             } else {
                 // Normal basis
-                values.at(j) = bases.at(j).eval(x(j));
+                values[j] = bases[j].eval(x(j));
             }
         }
 
@@ -112,8 +112,8 @@ SparseMatrix BSplineBasis::evalBasisJacobian2(DenseVector& x) const {
     std::vector<SparseVector> gradValues(numVariables);
 
     for (unsigned int i = 0; i < numVariables; ++i) {
-        funcValues[i] = bases.at(i).eval(x(i));
-        gradValues[i] = bases.at(i).evalFirstDerivative(x(i));
+        funcValues[i] = bases[i].eval(x(i));
+        gradValues[i] = bases[i].evalFirstDerivative(x(i));
     }
 
     // Calculate partial derivatives
@@ -122,9 +122,9 @@ SparseMatrix BSplineBasis::evalBasisJacobian2(DenseVector& x) const {
 
         for (unsigned int j = 0; j < numVariables; j++) {
             if (j == i)
-                values.at(j) = gradValues.at(j); // Differentiated basis
+                values[j] = gradValues[j]; // Differentiated basis
             else
-                values.at(j) = funcValues.at(j); // Normal basis
+                values[j] = funcValues[j]; // Normal basis
         }
 
         SparseVector Ji = kroneckerProductVectors(values);
@@ -167,11 +167,11 @@ SparseMatrix BSplineBasis::evalBasisHessian(DenseVector& x) const {
                 SparseMatrix Bk;
                 if (i == j && k == i) {
                     // Diagonal element
-                    Bk = bases.at(k).evalDerivative(x(k), 2);
+                    Bk = bases[k].evalDerivative(x(k), 2);
                 } else if (k == i || k == j) {
-                    Bk = bases.at(k).evalDerivative(x(k), 1);
+                    Bk = bases[k].evalDerivative(x(k), 1);
                 } else {
-                    Bk = bases.at(k).eval(x(k));
+                    Bk = bases[k].eval(x(k));
                 }
                 Hi = kroneckerProduct(temp, Bk);
             }
@@ -206,10 +206,10 @@ SparseMatrix BSplineBasis::insertKnots(
 
         if (i == dim) {
             // Build knot insertion matrix
-            Ai = bases.at(i).insertKnots(tau, multiplicity);
+            Ai = bases[i].insertKnots(tau, multiplicity);
         } else {
             // No insertion - identity matrix
-            int m = bases.at(i).getNumBasisFunctions();
+            int m = bases[i].getNumBasisFunctions();
             Ai.resize(m, m);
             Ai.setIdentity();
         }
@@ -229,7 +229,7 @@ SparseMatrix BSplineBasis::refineKnots() {
 
     for (unsigned int i = 0; i < numVariables; i++) {
         SparseMatrix temp = A;
-        SparseMatrix Ai   = bases.at(i).refineKnots();
+        SparseMatrix Ai   = bases[i].refineKnots();
 
         //A = kroneckerProduct(temp, Ai);
         A = myKroneckerProduct(temp, Ai);
@@ -246,7 +246,7 @@ SparseMatrix BSplineBasis::refineKnotsLocally(DenseVector x) {
 
     for (unsigned int i = 0; i < numVariables; i++) {
         SparseMatrix temp = A;
-        SparseMatrix Ai   = bases.at(i).refineKnotsLocally(x(i));
+        SparseMatrix Ai   = bases[i].refineKnotsLocally(x(i));
 
         //A = kroneckerProduct(temp, Ai);
         A = myKroneckerProduct(temp, Ai);
@@ -263,7 +263,7 @@ SparseMatrix BSplineBasis::decomposeToBezierForm() {
 
     for (unsigned int i = 0; i < numVariables; i++) {
         SparseMatrix temp = A;
-        SparseMatrix Ai   = bases.at(i).decomposeToBezierForm();
+        SparseMatrix Ai   = bases[i].decomposeToBezierForm();
 
         //A = kroneckerProduct(temp, Ai);
         A = myKroneckerProduct(temp, Ai);
@@ -287,7 +287,7 @@ BSplineBasis::reduceSupport(std::vector<double>& lb, std::vector<double>& ub) {
         SparseMatrix temp = A;
         SparseMatrix Ai;
 
-        Ai = bases.at(i).reduceSupport(lb.at(i), ub.at(i));
+        Ai = bases[i].reduceSupport(lb[i], ub[i]);
 
         //A = kroneckerProduct(temp, Ai);
         A = myKroneckerProduct(temp, Ai);
@@ -306,53 +306,53 @@ std::vector<unsigned int> BSplineBasis::getBasisDegrees() const {
 }
 
 unsigned int BSplineBasis::getBasisDegree(unsigned int dim) const {
-    return bases.at(dim).getBasisDegree();
+    return bases[dim].getBasisDegree();
 }
 
 unsigned int BSplineBasis::getNumBasisFunctions(unsigned int dim) const {
-    return bases.at(dim).getNumBasisFunctions();
+    return bases[dim].getNumBasisFunctions();
 }
 
 unsigned int BSplineBasis::getNumBasisFunctions() const {
     unsigned int prod = 1;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        prod *= bases.at(dim).getNumBasisFunctions();
+        prod *= bases[dim].getNumBasisFunctions();
     }
     return prod;
 }
 
 BSplineBasis1D BSplineBasis::getSingleBasis(int dim) {
-    return bases.at(dim);
+    return bases[dim];
 }
 
 std::vector<double> BSplineBasis::getKnotVector(int dim) const {
-    return bases.at(dim).getKnotVector();
+    return bases[dim].getKnotVector();
 }
 
 std::vector<std::vector<double>> BSplineBasis::getKnotVectors() const {
     std::vector<std::vector<double>> knots;
     for (unsigned int i = 0; i < numVariables; i++)
-        knots.push_back(bases.at(i).getKnotVector());
+        knots.push_back(bases[i].getKnotVector());
     return knots;
 }
 
 unsigned int
 BSplineBasis::getKnotMultiplicity(unsigned int dim, double tau) const {
-    return bases.at(dim).knotMultiplicity(tau);
+    return bases[dim].knotMultiplicity(tau);
 }
 
 double BSplineBasis::getKnotValue(int dim, int index) const {
-    return bases.at(dim).getKnotValue(index);
+    return bases[dim].getKnotValue(index);
 }
 
 unsigned int BSplineBasis::getLargestKnotInterval(unsigned int dim) const {
-    return bases.at(dim).indexLongestInterval();
+    return bases[dim].indexLongestInterval();
 }
 
 std::vector<unsigned int> BSplineBasis::getNumBasisFunctionsTarget() const {
     std::vector<unsigned int> ret;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        ret.push_back(bases.at(dim).getNumBasisFunctionsTarget());
+        ret.push_back(bases[dim].getNumBasisFunctionsTarget());
     }
     return ret;
 }
@@ -360,14 +360,14 @@ std::vector<unsigned int> BSplineBasis::getNumBasisFunctionsTarget() const {
 int BSplineBasis::supportedPrInterval() const {
     int ret = 1;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        ret *= (bases.at(dim).getBasisDegree() + 1);
+        ret *= (bases[dim].getBasisDegree() + 1);
     }
     return ret;
 }
 
 bool BSplineBasis::insideSupport(DenseVector& x) const {
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        if (!bases.at(dim).insideSupport(x(dim))) {
+        if (!bases[dim].insideSupport(x(dim))) {
             return false;
         }
     }
@@ -377,7 +377,7 @@ bool BSplineBasis::insideSupport(DenseVector& x) const {
 std::vector<double> BSplineBasis::getSupportLowerBound() const {
     std::vector<double> lb;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        std::vector<double> knots = bases.at(dim).getKnotVector();
+        std::vector<double> knots = bases[dim].getKnotVector();
         lb.push_back(knots.front());
     }
     return lb;
@@ -386,7 +386,7 @@ std::vector<double> BSplineBasis::getSupportLowerBound() const {
 std::vector<double> BSplineBasis::getSupportUpperBound() const {
     std::vector<double> ub;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        std::vector<double> knots = bases.at(dim).getKnotVector();
+        std::vector<double> knots = bases[dim].getKnotVector();
         ub.push_back(knots.back());
     }
     return ub;

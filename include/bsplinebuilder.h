@@ -173,12 +173,12 @@ private:
         // Number of basis functions (and coefficients) in each variable
         std::vector<unsigned int> dims;
         for (unsigned int i = 0; i < numVariables; i++)
-            dims.push_back(numBasisFunctions.at(i));
+            dims.push_back(numBasisFunctions[i]);
 
         std::reverse(dims.begin(), dims.end());
 
         for (unsigned int i = 0; i < numVariables; ++i)
-            if (numBasisFunctions.at(i) < 3)
+            if (numBasisFunctions[i] < 3)
                 throw Exception(
                     "BSpline::Builder::getSecondOrderDifferenceMatrix: Need at least three coefficients/basis function per variable.");
 
@@ -367,10 +367,8 @@ private:
 
         for (unsigned int i = 0; i < _data.getNumVariables(); ++i) {
             // Compute knot vector
-            knotVectors.push_back(computeKnotVector(
-                grid.at(i),
-                _degrees.at(i),
-                _numBasisFunctions.at(i)));
+            knotVectors.push_back(
+                computeKnotVector(grid[i], _degrees[i], _numBasisFunctions[i]));
         }
 
         return knotVectors;

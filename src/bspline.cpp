@@ -28,7 +28,7 @@ DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
             double knotAvg = 0;
             for (unsigned int k = j + 1; k <= j + basis.getBasisDegree(i);
                  k++) {
-                knotAvg += knots.at(k);
+                knotAvg += knots[k];
             }
             mu(j) = knotAvg / basis.getBasisDegree(i);
         }
@@ -38,7 +38,7 @@ DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
     // Calculate vectors of ones (with same length as corresponding knot average vector)
     std::vector<DenseVector> knotOnes;
     for (unsigned int i = 0; i < basis.getNumVariables(); i++)
-        knotOnes.push_back(DenseVector::Ones(mu_vectors.at(i).rows()));
+        knotOnes.push_back(DenseVector::Ones(mu_vectors[i].rows()));
 
     // Fill knot average matrix one column at the time
     DenseMatrix knot_averages = DenseMatrix::Zero(
@@ -51,9 +51,9 @@ DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
         for (unsigned int j = 0; j < basis.getNumVariables(); j++) {
             DenseMatrix temp = mu_ext;
             if (i == j)
-                mu_ext = Eigen::kroneckerProduct(temp, mu_vectors.at(j));
+                mu_ext = Eigen::kroneckerProduct(temp, mu_vectors[j]);
             else
-                mu_ext = Eigen::kroneckerProduct(temp, knotOnes.at(j));
+                mu_ext = Eigen::kroneckerProduct(temp, knotOnes[j]);
         }
         if (mu_ext.rows() != basis.getNumBasisFunctions())
             throw Exception(
@@ -158,19 +158,18 @@ void BSpline::reduceSupport(
 
     for (unsigned int dim = 0; dim < getNumVariables(); dim++) {
         // Check if new domain is empty
-        if (ub.at(dim) <= lb.at(dim) || lb.at(dim) >= su.at(dim) ||
-            ub.at(dim) <= sl.at(dim))
+        if (ub[dim] <= lb[dim] || lb[dim] >= su[dim] || ub[dim] <= sl[dim])
             throw Exception(
                 "BSpline::reduceSupport: Cannot reduce B-spline domain to empty set!");
 
         // Check if new domain is a strict subset
-        if (su.at(dim) < ub.at(dim) || sl.at(dim) > lb.at(dim))
+        if (su[dim] < ub[dim] || sl[dim] > lb[dim])
             throw Exception(
                 "BSpline::reduceSupport: Cannot expand B-spline domain!");
 
         // Tightest possible
-        sl.at(dim) = lb.at(dim);
-        su.at(dim) = ub.at(dim);
+        sl[dim] = lb[dim];
+        su[dim] = ub[dim];
     }
 
     if (doRegularizeKnotVectors) {
@@ -234,15 +233,15 @@ void BSpline::regularizeKnotVectors(
         // in higher dimensions because reallocation is necessary. This can be prevented by
         // precomputing the number of nonzeros when preallocating memory (see myKroneckerProduct).
         int numKnotsLB =
-            multiplicityTarget - basis.getKnotMultiplicity(dim, lb.at(dim));
+            multiplicityTarget - basis.getKnotMultiplicity(dim, lb[dim]);
         if (numKnotsLB > 0) {
-            insertKnots(lb.at(dim), dim, numKnotsLB);
+            insertKnots(lb[dim], dim, numKnotsLB);
         }
 
         int numKnotsUB =
-            multiplicityTarget - basis.getKnotMultiplicity(dim, ub.at(dim));
+            multiplicityTarget - basis.getKnotMultiplicity(dim, ub[dim]);
         if (numKnotsUB > 0) {
-            insertKnots(ub.at(dim), dim, numKnotsUB);
+            insertKnots(ub[dim], dim, numKnotsUB);
         }
     }
 }
@@ -270,16 +269,16 @@ std::string BSpline::getDescription() const {
     // See if all degrees are the same.
     bool equal = true;
     for (size_t i = 1; i < degrees.size(); ++i) {
-        equal = equal && (degrees.at(i) == degrees.at(i - 1));
+        equal = equal && (degrees[i] == degrees[i - 1]);
     }
 
     if (equal) {
         description.append(" ");
-        description.append(std::to_string(degrees.at(0)));
+        description.append(std::to_string(degrees[0]));
     } else {
         description.append("s (");
         for (size_t i = 0; i < degrees.size(); ++i) {
-            description.append(std::to_string(degrees.at(i)));
+            description.append(std::to_string(degrees[i]));
             if (i + 1 < degrees.size()) {
                 description.append(", ");
             }

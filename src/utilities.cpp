@@ -15,7 +15,7 @@ std::vector<double> denseVectorToVector(DenseVector const& denseVec) {
     std::vector<double> vec(denseVec.size());
 
     for (size_t i = 0; i < (size_t)denseVec.size(); ++i) {
-        vec.at(i) = denseVec(i);
+        vec[i] = denseVec(i);
     }
 
     return vec;
@@ -25,7 +25,7 @@ DenseVector vectorToDenseVector(std::vector<double> const& vec) {
     DenseVector denseVec(vec.size());
 
     for (size_t i = 0; i < vec.size(); ++i) {
-        denseVec(i) = vec.at(i);
+        denseVec(i) = vec[i];
     }
 
     return denseVec;
@@ -37,7 +37,7 @@ denseMatrixToVectorVector(DenseMatrix const& mat) {
 
     for (size_t i = 0; i < (size_t)mat.rows(); ++i) {
         for (size_t j = 0; j < (size_t)mat.cols(); ++j) {
-            vec.at(i).push_back(mat(i, j));
+            vec[i].push_back(mat(i, j));
         }
     }
 
@@ -47,13 +47,13 @@ denseMatrixToVectorVector(DenseMatrix const& mat) {
 DenseMatrix
 vectorVectorToDenseMatrix(std::vector<std::vector<double>> const& vec) {
     size_t numRows = vec.size();
-    size_t numCols = numRows > 0 ? vec.at(0).size() : 0;
+    size_t numCols = numRows > 0 ? vec[0].size() : 0;
 
     DenseMatrix mat(numRows, numCols);
 
     for (size_t i = 0; i < numRows; ++i) {
         for (size_t j = 0; j < numCols; ++j) {
-            mat(i, j) = vec.at(i).at(j);
+            mat(i, j) = vec[i][j];
         }
     }
 
