@@ -55,7 +55,7 @@ public:
     insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
     // Getters
-    unsigned int getNumVariables() const { return numVariables; }
+    unsigned int getNumVariables() const { return bases.size(); }
 
     BSplineBasis1D getSingleBasis(int dim);
     std::vector<std::vector<double>> getKnotVectors() const;
@@ -90,7 +90,6 @@ public:
 
 private:
     std::vector<BSplineBasis1D> bases;
-    unsigned int numVariables;
 
     friend bool operator==(BSplineBasis const& lhs, BSplineBasis const& rhs);
 };

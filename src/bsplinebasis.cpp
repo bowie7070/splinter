@@ -14,8 +14,8 @@ namespace SPLINTER {
 
 BSplineBasis::BSplineBasis(
     std::vector<std::vector<double>> const& knotVectors,
-    std::vector<unsigned int> basisDegrees) :
-    numVariables(knotVectors.size()) {
+    std::vector<unsigned int> basisDegrees) {
+    unsigned int numVariables = knotVectors.size();
     if (knotVectors.size() != basisDegrees.size())
         throw Exception(
             "BSplineBasis::BSplineBasis: Incompatible sizes. Number of knot vectors is not equal to size of degree vector.");
@@ -36,6 +36,7 @@ BSplineBasis::BSplineBasis(
 
 // Old implementation of Jacobian
 DenseMatrix BSplineBasis::evalBasisJacobianOld(DenseVector& x) const {
+    auto const numVariables = getNumVariables();
     // Jacobian basis matrix
     DenseMatrix J;
     J.setZero(getNumBasisFunctions(), numVariables);
@@ -68,6 +69,8 @@ DenseMatrix BSplineBasis::evalBasisJacobianOld(DenseVector& x) const {
 
 // NOTE: does not pass tests
 SparseMatrix BSplineBasis::evalBasisJacobian(DenseVector& x) const {
+    auto const numVariables = getNumVariables();
+
     // Jacobian basis matrix
     SparseMatrix J(getNumBasisFunctions(), numVariables);
     //J.setZero(numBasisFunctions(), numInputs);
@@ -104,6 +107,8 @@ SparseMatrix BSplineBasis::evalBasisJacobian(DenseVector& x) const {
 }
 
 SparseMatrix BSplineBasis::evalBasisJacobian2(DenseVector& x) const {
+    auto const numVariables = getNumVariables();
+
     // Jacobian basis matrix
     SparseMatrix J(getNumBasisFunctions(), numVariables);
 
@@ -138,6 +143,8 @@ SparseMatrix BSplineBasis::evalBasisJacobian2(DenseVector& x) const {
 }
 
 SparseMatrix BSplineBasis::evalBasisHessian(DenseVector& x) const {
+    auto const numVariables = getNumVariables();
+
     // Hessian basis matrix
     /* Hij = B1 x ... x DBi x ... x DBj x ... x Bn
      * (Hii = B1 x ... x DDBi x ... x Bn)
@@ -195,6 +202,8 @@ SparseMatrix BSplineBasis::evalBasisHessian(DenseVector& x) const {
 
 SparseMatrix BSplineBasis::insertKnots(
     double tau, unsigned int dim, unsigned int multiplicity) {
+    auto const numVariables = getNumVariables();
+
     SparseMatrix A(1, 1);
     //    A.resize(1,1);
     A.insert(0, 0) = 1;
@@ -224,6 +233,8 @@ SparseMatrix BSplineBasis::insertKnots(
 }
 
 SparseMatrix BSplineBasis::refineKnots() {
+    auto const numVariables = getNumVariables();
+
     SparseMatrix A(1, 1);
     A.insert(0, 0) = 1;
 
@@ -241,6 +252,8 @@ SparseMatrix BSplineBasis::refineKnots() {
 }
 
 SparseMatrix BSplineBasis::refineKnotsLocally(DenseVector x) {
+    auto const numVariables = getNumVariables();
+
     SparseMatrix A(1, 1);
     A.insert(0, 0) = 1;
 
@@ -258,6 +271,8 @@ SparseMatrix BSplineBasis::refineKnotsLocally(DenseVector x) {
 }
 
 SparseMatrix BSplineBasis::decomposeToBezierForm() {
+    auto const numVariables = getNumVariables();
+
     SparseMatrix A(1, 1);
     A.insert(0, 0) = 1;
 
@@ -276,6 +291,8 @@ SparseMatrix BSplineBasis::decomposeToBezierForm() {
 
 SparseMatrix
 BSplineBasis::reduceSupport(std::vector<double>& lb, std::vector<double>& ub) {
+    auto const numVariables = getNumVariables();
+
     if (lb.size() != ub.size() || lb.size() != numVariables)
         throw Exception(
             "BSplineBasis::reduceSupport: Incompatible dimension of domain bounds.");
@@ -314,6 +331,8 @@ unsigned int BSplineBasis::getNumBasisFunctions(unsigned int dim) const {
 }
 
 unsigned int BSplineBasis::getNumBasisFunctions() const {
+    auto const numVariables = getNumVariables();
+
     unsigned int prod = 1;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
         prod *= bases[dim].getNumBasisFunctions();
@@ -330,6 +349,8 @@ std::vector<double> BSplineBasis::getKnotVector(int dim) const {
 }
 
 std::vector<std::vector<double>> BSplineBasis::getKnotVectors() const {
+    auto const numVariables = getNumVariables();
+
     std::vector<std::vector<double>> knots;
     for (unsigned int i = 0; i < numVariables; i++)
         knots.push_back(bases[i].getKnotVector());
@@ -350,6 +371,8 @@ unsigned int BSplineBasis::getLargestKnotInterval(unsigned int dim) const {
 }
 
 std::vector<unsigned int> BSplineBasis::getNumBasisFunctionsTarget() const {
+    auto const numVariables = getNumVariables();
+
     std::vector<unsigned int> ret;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
         ret.push_back(bases[dim].getNumBasisFunctionsTarget());
@@ -358,6 +381,8 @@ std::vector<unsigned int> BSplineBasis::getNumBasisFunctionsTarget() const {
 }
 
 int BSplineBasis::supportedPrInterval() const {
+    auto const numVariables = getNumVariables();
+
     int ret = 1;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
         ret *= (bases[dim].getBasisDegree() + 1);
@@ -366,6 +391,8 @@ int BSplineBasis::supportedPrInterval() const {
 }
 
 bool BSplineBasis::insideSupport(DenseVector& x) const {
+    auto const numVariables = getNumVariables();
+
     for (unsigned int dim = 0; dim < numVariables; dim++) {
         if (!bases[dim].insideSupport(x(dim))) {
             return false;
@@ -375,6 +402,8 @@ bool BSplineBasis::insideSupport(DenseVector& x) const {
 }
 
 std::vector<double> BSplineBasis::getSupportLowerBound() const {
+    auto const numVariables = getNumVariables();
+
     std::vector<double> lb;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
         std::vector<double> knots = bases[dim].getKnotVector();
@@ -384,6 +413,8 @@ std::vector<double> BSplineBasis::getSupportLowerBound() const {
 }
 
 std::vector<double> BSplineBasis::getSupportUpperBound() const {
+    auto const numVariables = getNumVariables();
+
     std::vector<double> ub;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
         std::vector<double> knots = bases[dim].getKnotVector();
