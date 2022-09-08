@@ -34,12 +34,15 @@ public:
      */
     BSpline(DenseVector coefficients, BSplineBasis);
 
+    static double as_scalar(Eigen::Vector<double, 1> x) { return x[0]; }
+
     template <class x_type>
     double eval(x_type const& x) const {
         checkInput(x);
-        // NOTE: casting to DenseVector to allow accessing as res(0)
-        DenseVector res = coefficients.transpose() * evalBasis(x);
-        return res(0);
+
+        return basis.eval(x, [this](auto const& y) {
+            return as_scalar(coefficients.transpose() * y);
+        });
     }
 
     DenseMatrix evalJacobian(DenseVector x) const;
@@ -118,12 +121,6 @@ private:
      */
     DenseVector coefficients;
     DenseMatrix knotaverages;
-
-    // Evaluation of B-spline basis functions
-    template <class x_type>
-    auto evalBasis(x_type const& x) const {
-        return basis.eval(x);
-    }
 
     SparseMatrix evalBasisJacobian(DenseVector x) const;
 

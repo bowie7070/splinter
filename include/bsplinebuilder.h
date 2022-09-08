@@ -140,14 +140,12 @@ private:
 
         int i = 0;
         for (auto const& sample : _data.csamples()) {
-            auto row = basis.eval(sample.x);
-
-            using row_type = decltype(row);
-            using iterator = typename row_type::InnerIterator;
-
-            for (iterator it(row); it; ++it) {
-                coefficients.emplace_back(i, it.index(), it.value());
-            }
+            using iterator = SparseVector::InnerIterator;
+            basis.eval(sample.x, [&coefficients, i](SparseVector const& row) {
+                for (iterator it(row); it; ++it) {
+                    coefficients.emplace_back(i, it.index(), it.value());
+                }
+            });
 
             ++i;
         }

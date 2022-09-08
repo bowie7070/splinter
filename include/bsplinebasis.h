@@ -24,10 +24,10 @@ public:
         std::vector<unsigned int> basisDegrees);
 
     // Evaluation
-    template <class x_type>
-    SparseVector eval(x_type const& x) const {
+    template <class x_type, class callable>
+    auto eval(x_type const& x, callable tail) const {
         if constexpr (std::is_floating_point_v<x_type>) {
-            return bases[0].eval(x);
+            return tail(bases[0].eval(x));
         } else {
             assert(!bases.empty());
 
@@ -37,7 +37,7 @@ public:
                 product = kroneckerProduct(product, bases[i].eval(x[i])).eval();
             }
 
-            return product;
+            return tail(std::move(product));
         }
     }
 
