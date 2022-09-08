@@ -21,7 +21,25 @@ class BSplineBasis {
 public:
     BSplineBasis(
         std::vector<std::vector<double>> const& knotVectors,
-        std::vector<unsigned int> basisDegrees);
+        std::vector<unsigned int> basisDegrees) {
+        unsigned int numVariables = knotVectors.size();
+        if (knotVectors.size() != basisDegrees.size())
+            throw Exception(
+                "BSplineBasis::BSplineBasis: Incompatible sizes. Number of knot vectors is not equal to size of degree vector.");
+
+        // Set univariate bases
+        bases.clear();
+        for (unsigned int i = 0; i < numVariables; i++) {
+            bases.push_back(BSplineBasis1D(knotVectors[i], basisDegrees[i]));
+
+            // Adjust target number of basis functions used in e.g. refinement
+            if (numVariables > 2) {
+                // One extra knot is allowed
+                bases[i].setNumBasisFunctionsTarget(
+                    (basisDegrees[i] + 1) + 1); // Minimum degree+1
+            }
+        }
+    }
 
     // Evaluation
     template <class x_type, class callable>
@@ -41,8 +59,77 @@ public:
         }
     }
 
-    DenseMatrix evalBasisJacobianOld(DenseVector& x) const; // Depricated
-    SparseMatrix evalBasisJacobian(DenseVector& x) const;
+    DenseMatrix evalBasisJacobianOld(DenseVector& x) const {
+        auto const numVariables = getNumVariables();
+        // Jacobian basis matrix
+        DenseMatrix J;
+        J.setZero(getNumBasisFunctions(), numVariables);
+
+        // Calculate partial derivatives
+        for (unsigned int i = 0; i < numVariables; i++) {
+            // One column in basis jacobian
+            DenseVector bi;
+            bi.setOnes(1);
+            for (unsigned int j = 0; j < numVariables; j++) {
+                DenseVector temp = bi;
+                DenseVector xi;
+                if (j == i) {
+                    // Differentiated basis
+                    xi = bases[j].evalFirstDerivative(x(j));
+                } else {
+                    // Normal basis
+                    xi = bases[j].eval(x(j));
+                }
+
+                bi = kroneckerProduct(temp, xi);
+            }
+
+            // Fill out column
+            J.block(0, i, bi.rows(), 1) = bi.block(0, 0, bi.rows(), 1);
+        }
+
+        return J;
+    }
+
+    // NOTE: does not pass tests
+    SparseMatrix evalBasisJacobian(DenseVector& x) const {
+        auto const numVariables = getNumVariables();
+
+        // Jacobian basis matrix
+        SparseMatrix J(getNumBasisFunctions(), numVariables);
+        //J.setZero(numBasisFunctions(), numInputs);
+
+        // Calculate partial derivatives
+        for (unsigned int i = 0; i < numVariables; ++i) {
+            // One column in basis jacobian
+            std::vector<SparseVector> values(numVariables);
+
+            for (unsigned int j = 0; j < numVariables; ++j) {
+                if (j == i) {
+                    // Differentiated basis
+                    values[j] = bases[j].evalDerivative(x(j), 1);
+                } else {
+                    // Normal basis
+                    values[j] = bases[j].eval(x(j));
+                }
+            }
+
+            SparseVector Ji = kroneckerProductVectors(values);
+
+            // Fill out column
+            assert(Ji.outerSize() == 1);
+            for (SparseVector::InnerIterator it(Ji); it; ++it) {
+                if (it.value() != 0)
+                    J.insert(it.row(), i) = it.value();
+            }
+            //J.block(0,i,Ji.rows(),1) = bi.block(0,0,Ji.rows(),1);
+        }
+
+        J.makeCompressed();
+
+        return J;
+    }
+
     SparseMatrix evalBasisJacobian2(
         DenseVector& x) const; // A bit slower than evaBasisJacobianOld()
     SparseMatrix evalBasisHessian(DenseVector& x) const;
