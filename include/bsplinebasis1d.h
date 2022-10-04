@@ -107,7 +107,6 @@ public:
 private:
     // DeBoorCox algorithm for evaluating basis functions
     double deBoorCox(double x, int i, int k) const;
-    double deBoorCoxCoeff(double x, double x_min, double x_max) const;
 
     // Builds basis matrix for alternative evaluation of basis functions
     SparseMatrix buildBasisMatrix(
@@ -121,9 +120,7 @@ private:
     buildKnotInsertionMatrix(std::vector<double> const& refinedKnots) const;
 
     // Helper functions
-    bool inHalfopenInterval(double x, double x_min, double x_max) const {
-        return (x_min <= x) && (x < x_max);
-    }
+    
 
     // Member variables
     unsigned int degree;

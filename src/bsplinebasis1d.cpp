@@ -196,6 +196,17 @@ SparseMatrix BSplineBasis1D::buildBasisMatrix(
     return R;
 }
 
+double
+deBoorCoxCoeff(double x, double x_min, double x_max) {
+    if (x_min < x_max && x_min <= x && x <= x_max)
+        return (x - x_min) / (x_max - x_min);
+    return 0;
+}
+
+bool inHalfopenInterval(double x, double x_min, double x_max) {
+    return (x_min <= x) && (x < x_max);
+}
+
 double BSplineBasis1D::deBoorCox(double x, int i, int k) const {
     if (k == 0) {
         if (inHalfopenInterval(x, knots[i], knots[i + 1]))
@@ -213,13 +224,6 @@ double BSplineBasis1D::deBoorCox(double x, int i, int k) const {
 
         return s1 * r1 + (1 - s2) * r2;
     }
-}
-
-double
-BSplineBasis1D::deBoorCoxCoeff(double x, double x_min, double x_max) const {
-    if (x_min < x_max && x_min <= x && x <= x_max)
-        return (x - x_min) / (x_max - x_min);
-    return 0;
 }
 
 // Insert knots and compute knot insertion matrix (to update control points)
