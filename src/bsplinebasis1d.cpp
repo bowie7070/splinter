@@ -32,10 +32,7 @@ BSplineBasis1D::BSplineBasis1D(
 SparseVector BSplineBasis1D::eval(double x) const {
     SparseVector values(getNumBasisFunctions());
 
-    if (!insideSupport(x))
-        return values;
-
-    supportHack(x);
+    clamp_inside_support(x);
 
     // Evaluate nonzero basis functions
     indexSupportedBasisfunctions(x, [&](int const first, int const last) {
@@ -415,16 +412,6 @@ SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
 }
 
 /*
- * The B-spline domain is the half-open domain [ knots.first(), knots.end() ).
- * The hack checks if x is at the right boundary (if x = knots.end()), if so,
- * a small number is subtracted from x, moving x into the half-open domain.
- */
-void BSplineBasis1D::supportHack(double& x) const {
-    if (x == knots.back())
-        x = std::nextafter(x, std::numeric_limits<double>::lowest());
-}
-
-/*
  * Finds index i such that knots[i] <= x < knots[i+1].
  * Returns false if x is outside support.
  */
@@ -501,15 +488,6 @@ double BSplineBasis1D::getKnotValue(unsigned int index) const {
 
 unsigned int BSplineBasis1D::knotMultiplicity(double tau) const {
     return std::count(knots.begin(), knots.end(), tau);
-}
-
-bool BSplineBasis1D::inHalfopenInterval(
-    double x, double x_min, double x_max) const {
-    return (x_min <= x) && (x < x_max);
-}
-
-bool BSplineBasis1D::insideSupport(double x) const {
-    return (knots.front() <= x) && (x <= knots.back());
 }
 
 unsigned int BSplineBasis1D::getNumBasisFunctions() const {

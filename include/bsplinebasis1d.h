@@ -33,9 +33,31 @@ public:
     unsigned int knotMultiplicity(double tau)
         const; // Returns the number of repetitions of tau in the knot vector
 
-    // Support related
-    void supportHack(double& x) const;
-    bool insideSupport(double x) const;
+    /*
+ * The B-spline domain is the half-open domain [ knots.first(), knots.end() ).
+ * The hack checks if x is at the right boundary (if x = knots.end()), if so,
+ * a small number is subtracted from x, moving x into the half-open domain.
+ */
+    void supportHack(double& x) const {
+        if (x == knots.back())
+            x = std::nextafter(x, std::numeric_limits<double>::lowest());
+    }
+
+    bool insideSupport(double x) const {
+        return (knots.front() <= x) && (x <= knots.back());
+    }
+
+    void clamp_inside_support(double& x) const {
+        assert(knots.front() < knots.back());
+        if (x < knots.front()) {
+            x = knots.front();
+        } else if (x >= knots.back()) {
+            x = std::nextafter(
+                knots.back(),
+                std::numeric_limits<double>::lowest());
+        }
+    }
+
     SparseMatrix reduceSupport(double lb, double ub);
 
     // Getters
@@ -99,7 +121,9 @@ private:
     buildKnotInsertionMatrix(std::vector<double> const& refinedKnots) const;
 
     // Helper functions
-    bool inHalfopenInterval(double x, double x_min, double x_max) const;
+    bool inHalfopenInterval(double x, double x_min, double x_max) const {
+        return (x_min <= x) && (x < x_max);
+    }
 
     // Member variables
     unsigned int degree;
