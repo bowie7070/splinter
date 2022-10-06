@@ -16,7 +16,6 @@ namespace SPLINTER {
 
 class BSplineBasis1D {
 public:
-    BSplineBasis1D();
     BSplineBasis1D(std::vector<double> const& knots, unsigned int degree);
 
     // Evaluation of basis functions

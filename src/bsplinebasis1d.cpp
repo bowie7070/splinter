@@ -15,8 +15,6 @@
 
 namespace SPLINTER {
 
-BSplineBasis1D::BSplineBasis1D() {}
-
 BSplineBasis1D::BSplineBasis1D(
     std::vector<double> const& knots, unsigned int degree) :
     degree(degree),
