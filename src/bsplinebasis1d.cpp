@@ -15,18 +15,6 @@
 
 namespace SPLINTER {
 
-BSplineBasis1D::BSplineBasis1D(
-    std::vector<double> const& knots, unsigned int degree) :
-    degree(degree),
-    knots(knots),
-    targetNumBasisfunctions((degree + 1) + 2 * degree + 1) // Minimum p+1
-{
-    //    if (degree <= 0)
-    //        throw Exception("BSplineBasis1D::BSplineBasis1D: Cannot create B-spline basis functions of degree <= 0.");
-
-    assert(isKnotVectorRegular(knots, degree));
-}
-
 SparseVector BSplineBasis1D::eval(double x) const {
     SparseVector values(getNumBasisFunctions());
 
@@ -194,8 +182,7 @@ SparseMatrix BSplineBasis1D::buildBasisMatrix(
     return R;
 }
 
-double
-deBoorCoxCoeff(double x, double x_min, double x_max) {
+double deBoorCoxCoeff(double x, double x_min, double x_max) {
     if (x_min < x_max && x_min <= x && x <= x_max)
         return (x - x_min) / (x_max - x_min);
     return 0;

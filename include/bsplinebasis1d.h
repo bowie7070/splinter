@@ -16,7 +16,13 @@ namespace SPLINTER {
 
 class BSplineBasis1D {
 public:
-    BSplineBasis1D(std::vector<double> const& knots, unsigned int degree);
+    BSplineBasis1D(std::vector<double> const& knots, unsigned int degree) :
+        degree(degree),
+        knots(knots),
+        targetNumBasisfunctions((degree + 1) + 2 * degree + 1) // Minimum p+1
+    {
+        assert(isKnotVectorRegular(knots, degree));
+    }
 
     // Evaluation of basis functions
     SparseVector eval(double x) const;
