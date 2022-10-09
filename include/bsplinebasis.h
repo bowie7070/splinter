@@ -17,6 +17,26 @@
 
 namespace SPLINTER {
 
+struct basis1d_eval_uncached {
+    SparseVector operator()(BSplineBasis1D const& basis, int, double x) const {
+        return basis.eval(x);
+    }
+};
+
+template <class cache_type = std::map<std::tuple<int, double>, SparseVector>>
+struct basis1d_eval_cached {
+    mutable cache_type cache;
+
+    SparseVector const&
+    operator()(BSplineBasis1D const& basis, int i, double x) const {
+        auto pos = cache.find({i, x});
+        if (pos == cache.end()) {
+            std::tie(pos, std::ignore) = cache.insert({{i, x}, basis.eval(x)});
+        }
+        return pos->second;
+    }
+};
+
 class BSplineBasis {
 public:
     BSplineBasis(
@@ -42,17 +62,18 @@ public:
     }
 
     // Evaluation
-    template <class x_type, class callable>
-    auto eval(x_type const& x, callable tail) const {
+    template <class x_type, class eval_fn, class callable>
+    auto eval(x_type const& x, eval_fn& eval, callable tail) const {
         if constexpr (std::is_floating_point_v<x_type>) {
-            return tail(bases[0].eval(x));
+            return tail(eval(bases[0], 0, x));
         } else {
             assert(!bases.empty());
 
-            SparseVector product = bases[0].eval(x[0]);
+            SparseVector product = eval(bases[0], 0, x[0]);
 
             for (int i = 1, I = getNumVariables(); i < I; ++i) {
-                product = kroneckerProduct(product, bases[i].eval(x[i])).eval();
+                product =
+                    kroneckerProduct(product, eval(bases[i], i, x[i])).eval();
             }
 
             return tail(std::move(product));

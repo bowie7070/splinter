@@ -138,14 +138,19 @@ private:
 
         std::vector<Eigen::Triplet<double>> coefficients;
 
+        basis1d_eval_uncached cache;
+
         int i = 0;
         for (auto const& sample : _data.csamples()) {
             using iterator = SparseVector::InnerIterator;
-            basis.eval(sample.x, [&coefficients, i](SparseVector const& row) {
-                for (iterator it(row); it; ++it) {
-                    coefficients.emplace_back(i, it.index(), it.value());
-                }
-            });
+            basis.eval(
+                sample.x,
+                cache,
+                [&coefficients, i](SparseVector const& row) {
+                    for (iterator it(row); it; ++it) {
+                        coefficients.emplace_back(i, it.index(), it.value());
+                    }
+                });
 
             ++i;
         }

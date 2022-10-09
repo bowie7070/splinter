@@ -36,13 +36,19 @@ public:
 
     static double as_scalar(Eigen::Vector<double, 1> x) { return x[0]; }
 
-    template <class x_type>
-    double eval(x_type const& x) const {
+    template <class x_type, class eval_fn>
+    double eval(x_type const& x, eval_fn& cache) const {
         checkInput(x);
 
-        return basis.eval(x, [this](auto const& y) {
+        return basis.eval(x, cache, [this](auto const& y) {
             return as_scalar(coefficients.transpose() * y);
         });
+    }
+
+    template <class x_type>
+    double eval(x_type const& x) const {
+        basis1d_eval_uncached cache;
+        return eval(x, cache);
     }
 
     DenseMatrix evalJacobian(DenseVector x) const;
@@ -56,6 +62,11 @@ public:
     template <class x_type>
     double operator()(x_type const& x) const {
         return eval(x);
+    }
+
+    template <class x_type, class eval_fn>
+    double operator()(x_type const& x, eval_fn& cache) const {
+        return eval(x, cache);
     }
 
     double operator()(double const x0) const { return eval(std::array{x0}); }
