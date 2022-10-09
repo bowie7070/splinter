@@ -54,7 +54,6 @@ class SPLINTER_API BSpline::Builder {
 public:
     Builder(data_table const& data) :
         _data(data),
-        _degrees(getBSplineDegrees(data.getNumVariables(), 3)),
         _numBasisFunctions(
             std::vector<unsigned int>(data.getNumVariables(), 0)),
         _knotSpacing(KnotSpacing::AS_SAMPLED),
@@ -73,15 +72,7 @@ public:
     // Set build options
 
     Builder& degree(unsigned int degree) {
-        _degrees = getBSplineDegrees(_data.getNumVariables(), degree);
-        return *this;
-    }
-
-    Builder& degree(std::vector<unsigned int> degrees) {
-        if (degrees.size() != _data.getNumVariables())
-            throw Exception(
-                "BSpline::Builder: Inconsistent length on degree vector.");
-        _degrees = degrees;
+        _degree = degree;
         return *this;
     }
 
@@ -112,7 +103,7 @@ public:
 
     // Build B-spline
     BSpline build() const {
-        BSplineBasis basis{computeKnotVectors(), _degrees};
+        BSplineBasis basis{computeKnotVectors(), _degree};
         auto coefficients = computeCoefficients(basis);
 
         return BSpline(std::move(coefficients), std::move(basis));
@@ -360,10 +351,6 @@ private:
 
     // Computing knots
     std::vector<std::vector<double>> computeKnotVectors() const {
-        if (_data.getNumVariables() != _degrees.size())
-            throw Exception(
-                "BSpline::Builder::computeKnotVectors: Inconsistent sizes on input vectors.");
-
         std::vector<std::vector<double>> grid = _data._getTableX();
 
         std::vector<std::vector<double>> knotVectors;
@@ -371,7 +358,7 @@ private:
         for (unsigned int i = 0; i < _data.getNumVariables(); ++i) {
             // Compute knot vector
             knotVectors.push_back(
-                computeKnotVector(grid[i], _degrees[i], _numBasisFunctions[i]));
+                computeKnotVector(grid[i], _degree, _numBasisFunctions[i]));
         }
 
         return knotVectors;
@@ -395,7 +382,7 @@ private:
 
     // Member variables
     data_table _data;
-    std::vector<unsigned int> _degrees;
+    unsigned int _degree = 3;
     std::vector<unsigned int> _numBasisFunctions;
     KnotSpacing _knotSpacing;
     Smoothing _smoothing;

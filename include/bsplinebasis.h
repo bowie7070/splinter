@@ -41,22 +41,19 @@ class BSplineBasis {
 public:
     BSplineBasis(
         std::vector<std::vector<double>> const& knotVectors,
-        std::vector<unsigned int> basisDegrees) {
+        unsigned int basisDegrees) {
         unsigned int numVariables = knotVectors.size();
-        if (knotVectors.size() != basisDegrees.size())
-            throw Exception(
-                "BSplineBasis::BSplineBasis: Incompatible sizes. Number of knot vectors is not equal to size of degree vector.");
 
         // Set univariate bases
         bases.clear();
         for (unsigned int i = 0; i < numVariables; i++) {
-            bases.push_back(BSplineBasis1D(knotVectors[i], basisDegrees[i]));
+            bases.push_back(BSplineBasis1D(knotVectors[i], basisDegrees));
 
             // Adjust target number of basis functions used in e.g. refinement
             if (numVariables > 2) {
                 // One extra knot is allowed
                 bases[i].setNumBasisFunctionsTarget(
-                    (basisDegrees[i] + 1) + 1); // Minimum degree+1
+                    (basisDegrees + 1) + 1); // Minimum degree+1
             }
         }
     }
