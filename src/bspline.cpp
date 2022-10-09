@@ -60,9 +60,9 @@ BSpline::BSpline(
 /*
  * Construct from saved data
  */
-BSpline::BSpline(const char* fileName) : BSpline(std::string(fileName)) {}
+BSpline::BSpline(char const* fileName) : BSpline(std::string(fileName)) {}
 
-BSpline::BSpline(const std::string& fileName) : Function(1) {
+BSpline::BSpline(std::string const& fileName) : Function(1) {
     load(fileName);
 }
 
@@ -172,7 +172,7 @@ DenseMatrix BSpline::getControlPoints() const {
     return controlPoints;
 }
 
-void BSpline::setCoefficients(const DenseVector& coefficients) {
+void BSpline::setCoefficients(DenseVector const& coefficients) {
     if (coefficients.size() != getNumBasisFunctions())
         throw Exception(
             "BSpline::setControlPoints: Incompatible size of coefficient vector.");
@@ -181,7 +181,7 @@ void BSpline::setCoefficients(const DenseVector& coefficients) {
     checkControlPoints();
 }
 
-void BSpline::setControlPoints(const DenseMatrix& controlPoints) {
+void BSpline::setControlPoints(DenseMatrix const& controlPoints) {
     if (controlPoints.cols() != numVariables + 1)
         throw Exception(
             "BSpline::setControlPoints: Incompatible size of control point matrix.");
@@ -194,7 +194,7 @@ void BSpline::setControlPoints(const DenseMatrix& controlPoints) {
     checkControlPoints();
 }
 
-void BSpline::updateControlPoints(const DenseMatrix& A) {
+void BSpline::updateControlPoints(DenseMatrix const& A) {
     if (A.cols() != coefficients.rows() || A.cols() != knotaverages.rows())
         throw Exception(
             "BSpline::updateControlPoints: Incompatible size of linear transformation matrix.");
@@ -380,13 +380,13 @@ bool BSpline::removeUnsupportedBasisFunctions(
     return true;
 }
 
-void BSpline::save(const std::string& fileName) const {
+void BSpline::save(std::string const& fileName) const {
     Serializer s;
     s.serialize(*this);
     s.saveToFile(fileName);
 }
 
-void BSpline::load(const std::string& fileName) {
+void BSpline::load(std::string const& fileName) {
     Serializer s(fileName);
     s.deserialize(*this);
 }

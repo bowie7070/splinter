@@ -25,13 +25,13 @@ public:
     DataTable();
     DataTable(bool allowDuplicates);
     DataTable(bool allowDuplicates, bool allowIncompleteGrid);
-    DataTable(const char* fileName);
-    DataTable(const std::string& fileName); // Load DataTable from file
+    DataTable(char const* fileName);
+    DataTable(std::string const& fileName); // Load DataTable from file
 
     /*
      * Functions for adding a sample (x,y)
      */
-    void addSample(const DataPoint& sample);
+    void addSample(DataPoint const& sample);
     void addSample(double x, double y);
     void addSample(std::vector<double> x, double y);
     void addSample(DenseVector x, double y);
@@ -45,7 +45,7 @@ public:
 
     unsigned int getNumVariables() const { return numVariables; }
     unsigned int getNumSamples() const { return samples.size(); }
-    const std::multiset<DataPoint>& getSamples() const { return samples; }
+    std::multiset<DataPoint> const& getSamples() const { return samples; }
 
     std::vector<std::set<double>> getGrid() const { return grid; }
     std::vector<std::vector<double>> getTableX() const;
@@ -53,7 +53,7 @@ public:
 
     bool isGridComplete() const;
 
-    void save(const std::string& fileName) const;
+    void save(std::string const& fileName) const;
 
 private:
     bool allowDuplicates;
@@ -68,20 +68,20 @@ private:
     initDataStructures(); // Initialise grid to be a std::vector of xDim std::sets
     unsigned int getNumSamplesRequired() const;
 
-    void recordGridPoint(const DataPoint& sample);
+    void recordGridPoint(DataPoint const& sample);
 
     // Used by functions that require the grid to be complete before they start their operation
     // This function prints a message and exits the program if the grid is not complete.
     void gridCompleteGuard() const;
 
-    void load(const std::string& fileName);
+    void load(std::string const& fileName);
 
     friend class Serializer;
-    friend bool operator==(const DataTable& lhs, const DataTable& rhs);
+    friend bool operator==(DataTable const& lhs, DataTable const& rhs);
 };
 
-DataTable operator+(const DataTable& lhs, const DataTable& rhs);
-DataTable operator-(const DataTable& lhs, const DataTable& rhs);
+DataTable operator+(DataTable const& lhs, DataTable const& rhs);
+DataTable operator-(DataTable const& lhs, DataTable const& rhs);
 
 } // namespace SPLINTER
 

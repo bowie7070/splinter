@@ -26,7 +26,7 @@ namespace SPLINTER {
 template <class lhs, class rhs>
 class LinearSolver {
 public:
-    bool solve(const lhs& A, const rhs& b, rhs& x) const {
+    bool solve(lhs const& A, rhs const& b, rhs& x) const {
         if (!consistentData(A, b))
             throw Exception(
                 "LinearSolver::solve: Inconsistent matrix dimensions!");
@@ -48,13 +48,13 @@ public:
 private:
     double tol = 1e-12; // Relative error tolerance
 
-    virtual bool doSolve(const lhs& A, const rhs& b, rhs& x) const = 0;
+    virtual bool doSolve(lhs const& A, rhs const& b, rhs& x) const = 0;
 
-    bool consistentData(const lhs& A, const rhs& b) const {
+    bool consistentData(lhs const& A, rhs const& b) const {
         return A.rows() == b.rows();
     }
 
-    bool validSolution(const lhs& A, const rhs& b, const rhs& x) const {
+    bool validSolution(lhs const& A, rhs const& b, rhs const& x) const {
         //return b.isApprox(A*x);
         double err = (A * x - b).norm() / b.norm();
 
@@ -65,7 +65,7 @@ private:
 template <class rhs = DenseVector>
 class DenseSVD : public LinearSolver<DenseMatrix, rhs> {
 private:
-    bool doSolve(const DenseMatrix& A, const rhs& b, rhs& x) const {
+    bool doSolve(DenseMatrix const& A, rhs const& b, rhs& x) const {
         // Solve linear system
         Eigen::JacobiSVD<DenseMatrix> svd(
             A,
@@ -78,7 +78,7 @@ private:
 template <class rhs = DenseVector>
 class DenseQR : public LinearSolver<DenseMatrix, rhs> {
 private:
-    bool doSolve(const DenseMatrix& A, const rhs& b, rhs& x) const {
+    bool doSolve(DenseMatrix const& A, rhs const& b, rhs& x) const {
         //x = A.colPivHouseholderQr().solve(b);
 
         // Solve linear system
@@ -97,7 +97,7 @@ private:
 template <class rhs = DenseVector>
 class SparseBiCG : public LinearSolver<SparseMatrix, rhs> {
 private:
-    bool doSolve(const SparseMatrix& A, const rhs& b, rhs& x) const {
+    bool doSolve(SparseMatrix const& A, rhs const& b, rhs& x) const {
         // Init BiCGSTAB solver (requires square matrices)
         Eigen::BiCGSTAB<SparseMatrix> sparseSolver(A);
 
@@ -115,7 +115,7 @@ private:
 template <class rhs = DenseVector>
 class SparseLU : public LinearSolver<SparseMatrix, rhs> {
 private:
-    bool doSolve(const SparseMatrix& A, const rhs& b, rhs& x) const {
+    bool doSolve(SparseMatrix const& A, rhs const& b, rhs& x) const {
         // Init SparseLU solver (requires square matrices)
         Eigen::SparseLU<SparseMatrix> sparseSolver;
         // Compute the ordering permutation vector from the structural pattern of A
@@ -137,7 +137,7 @@ private:
 template <class rhs = DenseVector>
 class SparseQR : public LinearSolver<SparseMatrix, rhs> {
 private:
-    bool doSolve(const SparseMatrix& A, const rhs& b, rhs& x) const {
+    bool doSolve(SparseMatrix const& A, rhs const& b, rhs& x) const {
         // Init SparseQR solver (works with rectangular matrices)
         Eigen::SparseQR<SparseMatrix, Eigen::COLAMDOrdering<int>> sparseSolver;
         sparseSolver.analyzePattern(A);

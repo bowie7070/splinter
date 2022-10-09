@@ -29,9 +29,9 @@ DataTable::DataTable(bool allowDuplicates, bool allowIncompleteGrid) :
     numDuplicates(0),
     numVariables(0) {}
 
-DataTable::DataTable(const char* fileName) : DataTable(std::string(fileName)) {}
+DataTable::DataTable(char const* fileName) : DataTable(std::string(fileName)) {}
 
-DataTable::DataTable(const std::string& fileName) {
+DataTable::DataTable(std::string const& fileName) {
     load(fileName);
 }
 
@@ -47,7 +47,7 @@ void DataTable::addSample(DenseVector x, double y) {
     addSample(DataPoint(x, y));
 }
 
-void DataTable::addSample(const DataPoint& sample) {
+void DataTable::addSample(DataPoint const& sample) {
     if (getNumSamples() == 0) {
         numVariables = sample.getDimX();
         initDataStructures();
@@ -86,7 +86,7 @@ void DataTable::addSample(std::initializer_list<DataPoint> samples) {
     }
 }
 
-void DataTable::recordGridPoint(const DataPoint& sample) {
+void DataTable::recordGridPoint(DataPoint const& sample) {
     for (unsigned int i = 0; i < getNumVariables(); i++) {
         grid.at(i).insert(sample.getX().at(i));
     }
@@ -121,13 +121,13 @@ void DataTable::gridCompleteGuard() const {
     }
 }
 
-void DataTable::save(const std::string& fileName) const {
+void DataTable::save(std::string const& fileName) const {
     Serializer s;
     s.serialize(*this);
     s.saveToFile(fileName);
 }
 
-void DataTable::load(const std::string& fileName) {
+void DataTable::load(std::string const& fileName) {
     Serializer s(fileName);
     s.deserialize(*this);
 }
@@ -181,7 +181,7 @@ std::vector<double> DataTable::getVectorY() const {
     return y;
 }
 
-DataTable operator+(const DataTable& lhs, const DataTable& rhs) {
+DataTable operator+(DataTable const& lhs, DataTable const& rhs) {
     if (lhs.getNumVariables() != rhs.getNumVariables()) {
         throw Exception(
             "operator+(DataTable, DataTable): trying to add two DataTable's of different dimensions!");
@@ -198,7 +198,7 @@ DataTable operator+(const DataTable& lhs, const DataTable& rhs) {
     return result;
 }
 
-DataTable operator-(const DataTable& lhs, const DataTable& rhs) {
+DataTable operator-(DataTable const& lhs, DataTable const& rhs) {
     if (lhs.getNumVariables() != rhs.getNumVariables()) {
         throw Exception(
             "operator-(DataTable, DataTable): trying to subtract two DataTable's of different dimensions!");

@@ -31,12 +31,12 @@ DataPoint::DataPoint(DenseVector x, double y) {
     setData(newX, y);
 }
 
-void DataPoint::setData(const std::vector<double>& x, double y) {
+void DataPoint::setData(std::vector<double> const& x, double y) {
     this->x = x;
     this->y = y;
 }
 
-bool DataPoint::operator<(const DataPoint& rhs) const {
+bool DataPoint::operator<(DataPoint const& rhs) const {
     if (this->getDimX() != rhs.getDimX())
         throw Exception(
             "DataPoint::operator<: Cannot compare data points of different dimensions");

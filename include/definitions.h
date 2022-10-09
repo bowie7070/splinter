@@ -52,9 +52,9 @@ private:
     std::string __what;
 
 public:
-    Exception(const std::string& what) : __what(what) {}
+    Exception(std::string const& what) : __what(what) {}
 
-    const char* what() const throw() { return this->__what.c_str(); }
+    char const* what() const throw() { return this->__what.c_str(); }
 };
 
 } // namespace SPLINTER

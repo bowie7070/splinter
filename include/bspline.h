@@ -48,8 +48,8 @@ public:
     /**
      * Construct B-spline from file
      */
-    BSpline(const char* fileName);
-    BSpline(const std::string& fileName);
+    BSpline(char const* fileName);
+    BSpline(std::string const& fileName);
 
     virtual BSpline* clone() const { return new BSpline(*this); }
 
@@ -95,12 +95,12 @@ public:
     /**
      * Setters
      */
-    void setCoefficients(const DenseVector& coefficients);
-    void setControlPoints(const DenseMatrix& controlPoints);
+    void setCoefficients(DenseVector const& coefficients);
+    void setControlPoints(DenseMatrix const& controlPoints);
     void checkControlPoints() const;
 
     // Linear transformation of control points (B-spline has affine invariance)
-    void updateControlPoints(const DenseMatrix& A);
+    void updateControlPoints(DenseMatrix const& A);
 
     // Reduce support of B-spline
     void reduceSupport(
@@ -121,7 +121,7 @@ public:
     void
     insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
-    void save(const std::string& fileName) const override;
+    void save(std::string const& fileName) const override;
 
     std::string getDescription() const override;
 
@@ -150,10 +150,10 @@ private:
     // Helper functions
     bool pointInDomain(DenseVector x) const;
 
-    void load(const std::string& fileName) override;
+    void load(std::string const& fileName) override;
 
     friend class Serializer;
-    friend bool operator==(const BSpline& lhs, const BSpline& rhs);
+    friend bool operator==(BSpline const& lhs, BSpline const& rhs);
 };
 
 } // namespace SPLINTER

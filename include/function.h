@@ -37,7 +37,7 @@ public:
     /**
      * Returns the function value at x
      */
-    double eval(const std::vector<double>& x) const;
+    double eval(std::vector<double> const& x) const;
 
     /**
      * Returns the (1 x numVariables) Jacobian evaluated at x
@@ -47,7 +47,7 @@ public:
     /**
      * Returns the (1 x numVariables) Jacobian evaluated at x
      */
-    std::vector<double> evalJacobian(const std::vector<double>& x) const;
+    std::vector<double> evalJacobian(std::vector<double> const& x) const;
 
     /**
      * Returns the (numVariables x numVariables) Hessian evaluated at x
@@ -58,7 +58,7 @@ public:
      * Returns the (numVariables x numVariables) Hessian evaluated at x
      */
     std::vector<std::vector<double>>
-    evalHessian(const std::vector<double>& x) const;
+    evalHessian(std::vector<double> const& x) const;
 
     /**
      * Get the dimension
@@ -78,11 +78,11 @@ public:
      * Returns the central difference at x
      * Vector of numVariables length
      */
-    std::vector<double> centralDifference(const std::vector<double>& x) const;
+    std::vector<double> centralDifference(std::vector<double> const& x) const;
     DenseMatrix centralDifference(DenseVector x) const;
 
     std::vector<std::vector<double>>
-    secondOrderCentralDifference(const std::vector<double>& x) const;
+    secondOrderCentralDifference(std::vector<double> const& x) const;
     DenseMatrix secondOrderCentralDifference(DenseVector x) const;
 
     /**

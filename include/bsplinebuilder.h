@@ -37,7 +37,7 @@ enum class BSpline::KnotSpacing {
 // B-spline builder class
 class SPLINTER_API BSpline::Builder {
 public:
-    Builder(const DataTable& data);
+    Builder(DataTable const& data);
 
     Builder& alpha(double alpha) {
         if (alpha < 0)
@@ -103,34 +103,34 @@ private:
     }
 
     // Control point computations
-    DenseVector computeCoefficients(const BSpline& bspline) const;
-    DenseVector computeBSplineCoefficients(const BSpline& bspline) const;
-    SparseMatrix computeBasisFunctionMatrix(const BSpline& bspline) const;
+    DenseVector computeCoefficients(BSpline const& bspline) const;
+    DenseVector computeBSplineCoefficients(BSpline const& bspline) const;
+    SparseMatrix computeBasisFunctionMatrix(BSpline const& bspline) const;
     DenseVector getSamplePointValues() const;
     // P-spline control point calculation
     SparseMatrix
-    getSecondOrderFiniteDifferenceMatrix(const BSpline& bspline) const;
+    getSecondOrderFiniteDifferenceMatrix(BSpline const& bspline) const;
 
     // Computing knots
     std::vector<std::vector<double>> computeKnotVectors() const;
     std::vector<double> computeKnotVector(
-        const std::vector<double>& values,
+        std::vector<double> const& values,
         unsigned int degree,
         unsigned int numBasisFunctions) const;
     std::vector<double> knotVectorMovingAverage(
-        const std::vector<double>& values, unsigned int degree) const;
+        std::vector<double> const& values, unsigned int degree) const;
     std::vector<double> knotVectorEquidistant(
-        const std::vector<double>& values,
+        std::vector<double> const& values,
         unsigned int degree,
         unsigned int numBasisFunctions) const;
     std::vector<double> knotVectorBuckets(
-        const std::vector<double>& values,
+        std::vector<double> const& values,
         unsigned int degree,
         unsigned int maxSegments = 10) const;
 
     // Auxiliary
     std::vector<double>
-    extractUniqueSorted(const std::vector<double>& values) const;
+    extractUniqueSorted(std::vector<double> const& values) const;
 
     // Member variables
     DataTable _data;

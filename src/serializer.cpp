@@ -22,19 +22,19 @@ Serializer::Serializer() {
     stream = StreamType(0);
 }
 
-Serializer::Serializer(const std::string& fileName) {
+Serializer::Serializer(std::string const& fileName) {
     stream = StreamType(0);
     loadFromFile(fileName);
 }
 
-void Serializer::saveToFile(const std::string& fileName) {
+void Serializer::saveToFile(std::string const& fileName) {
     std::fstream fs(fileName, std::fstream::out | std::fstream::binary);
 
-    for (const auto& byte : stream)
+    for (auto const& byte : stream)
         fs << byte;
 }
 
-void Serializer::loadFromFile(const std::string& fileName) {
+void Serializer::loadFromFile(std::string const& fileName) {
     // Open the file in binary mode at the end
     std::ifstream ifs(fileName, std::ios::binary | std::ios::ate);
 
@@ -61,7 +61,7 @@ void Serializer::loadFromFile(const std::string& fileName) {
 
     stream.clear();
     // Convert from char to uint_8 vector
-    for (const char& byte : result)
+    for (char const& byte : result)
         stream.push_back((uint8_t)byte);
 
     read = stream.cbegin();
@@ -71,31 +71,31 @@ void Serializer::loadFromFile(const std::string& fileName) {
  * get_size implementations
  */
 
-size_t Serializer::get_size(const DataPoint& obj) {
+size_t Serializer::get_size(DataPoint const& obj) {
     return get_size(obj.x) + get_size(obj.y);
 }
 
-size_t Serializer::get_size(const DataTable& obj) {
+size_t Serializer::get_size(DataTable const& obj) {
     return get_size(obj.allowDuplicates) + get_size(obj.allowIncompleteGrid) +
            get_size(obj.numDuplicates) + get_size(obj.numVariables) +
            get_size(obj.samples) + get_size(obj.grid);
 }
 
-size_t Serializer::get_size(const BSpline& obj) {
+size_t Serializer::get_size(BSpline const& obj) {
     return get_size(obj.basis) + get_size(obj.knotaverages) +
            get_size(obj.coefficients) + get_size(obj.numVariables);
 }
 
-size_t Serializer::get_size(const BSplineBasis& obj) {
+size_t Serializer::get_size(BSplineBasis const& obj) {
     return get_size(obj.bases) + get_size(obj.numVariables);
 }
 
-size_t Serializer::get_size(const BSplineBasis1D& obj) {
+size_t Serializer::get_size(BSplineBasis1D const& obj) {
     return get_size(obj.degree) + get_size(obj.knots) +
            get_size(obj.targetNumBasisfunctions);
 }
 
-size_t Serializer::get_size(const DenseMatrix& obj) {
+size_t Serializer::get_size(DenseMatrix const& obj) {
     size_t size = sizeof(obj.rows());
     size += sizeof(obj.cols());
     size_t numElements = obj.rows() * obj.cols();
@@ -105,7 +105,7 @@ size_t Serializer::get_size(const DenseMatrix& obj) {
     return size;
 }
 
-size_t Serializer::get_size(const DenseVector& obj) {
+size_t Serializer::get_size(DenseVector const& obj) {
     size_t size        = sizeof(obj.rows());
     size_t numElements = obj.rows();
     if (numElements > 0) {
@@ -114,12 +114,12 @@ size_t Serializer::get_size(const DenseVector& obj) {
     return size;
 }
 
-size_t Serializer::get_size(const SparseMatrix& obj) {
+size_t Serializer::get_size(SparseMatrix const& obj) {
     DenseMatrix temp(obj);
     return get_size(temp);
 }
 
-size_t Serializer::get_size(const SparseVector& obj) {
+size_t Serializer::get_size(SparseVector const& obj) {
     DenseVector temp(obj);
     return get_size(temp);
 }
@@ -128,12 +128,12 @@ size_t Serializer::get_size(const SparseVector& obj) {
  * _serialize implementations
  */
 
-void Serializer::_serialize(const DataPoint& obj) {
+void Serializer::_serialize(DataPoint const& obj) {
     _serialize(obj.x);
     _serialize(obj.y);
 }
 
-void Serializer::_serialize(const DataTable& obj) {
+void Serializer::_serialize(DataTable const& obj) {
     _serialize(obj.allowDuplicates);
     _serialize(obj.allowIncompleteGrid);
     _serialize(obj.numDuplicates);
@@ -142,25 +142,25 @@ void Serializer::_serialize(const DataTable& obj) {
     _serialize(obj.grid);
 }
 
-void Serializer::_serialize(const BSpline& obj) {
+void Serializer::_serialize(BSpline const& obj) {
     _serialize(obj.basis);
     _serialize(obj.knotaverages);
     _serialize(obj.coefficients);
     _serialize(obj.numVariables);
 }
 
-void Serializer::_serialize(const BSplineBasis& obj) {
+void Serializer::_serialize(BSplineBasis const& obj) {
     _serialize(obj.bases);
     _serialize(obj.numVariables);
 }
 
-void Serializer::_serialize(const BSplineBasis1D& obj) {
+void Serializer::_serialize(BSplineBasis1D const& obj) {
     _serialize(obj.degree);
     _serialize(obj.knots);
     _serialize(obj.targetNumBasisfunctions);
 }
 
-void Serializer::_serialize(const DenseMatrix& obj) {
+void Serializer::_serialize(DenseMatrix const& obj) {
     // Store the number of matrix rows and columns first
     _serialize(obj.rows());
     _serialize(obj.cols());
@@ -172,7 +172,7 @@ void Serializer::_serialize(const DenseMatrix& obj) {
     }
 }
 
-void Serializer::_serialize(const DenseVector& obj) {
+void Serializer::_serialize(DenseVector const& obj) {
     // Store the number of vector rows
     _serialize(obj.rows());
     // Store the vector elements
@@ -181,12 +181,12 @@ void Serializer::_serialize(const DenseVector& obj) {
     }
 }
 
-void Serializer::_serialize(const SparseMatrix& obj) {
+void Serializer::_serialize(SparseMatrix const& obj) {
     DenseMatrix temp(obj);
     _serialize(temp);
 }
 
-void Serializer::_serialize(const SparseVector& obj) {
+void Serializer::_serialize(SparseVector const& obj) {
     DenseVector temp(obj);
     _serialize(temp);
 }

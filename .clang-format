@@ -21,3 +21,5 @@ PointerAlignment: Left
 ReflowComments: false
 TabWidth: 4
 UseTab: Never
+QualifierAlignment: Right
+#InsertBraces: true

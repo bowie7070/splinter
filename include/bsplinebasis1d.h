@@ -17,7 +17,7 @@ namespace SPLINTER {
 class BSplineBasis1D {
 public:
     BSplineBasis1D();
-    BSplineBasis1D(const std::vector<double>& knots, unsigned int degree);
+    BSplineBasis1D(std::vector<double> const& knots, unsigned int degree);
 
     // Evaluation of basis functions
     SparseVector eval(double x) const;
@@ -49,7 +49,7 @@ public:
     std::vector<int> indexSupportedBasisfunctions(double x) const;
     int indexHalfopenInterval(double x) const;
     unsigned int indexLongestInterval() const;
-    unsigned int indexLongestInterval(const std::vector<double>& vec) const;
+    unsigned int indexLongestInterval(std::vector<double> const& vec) const;
 
     // Setters
     void setNumBasisFunctionsTarget(unsigned int target) {
@@ -70,7 +70,7 @@ private:
      * Implements Oslo Algorithm 1 from Lyche and Moerken (2011). Spline methods draft.
      */
     SparseMatrix
-    buildKnotInsertionMatrix(const std::vector<double>& refinedKnots) const;
+    buildKnotInsertionMatrix(std::vector<double> const& refinedKnots) const;
 
     // Helper functions
     bool inHalfopenInterval(double x, double x_min, double x_max) const;
@@ -82,9 +82,9 @@ private:
 
     friend class Serializer;
     friend bool
-    operator==(const BSplineBasis1D& lhs, const BSplineBasis1D& rhs);
+    operator==(BSplineBasis1D const& lhs, BSplineBasis1D const& rhs);
     friend bool
-    operator!=(const BSplineBasis1D& lhs, const BSplineBasis1D& rhs);
+    operator!=(BSplineBasis1D const& lhs, BSplineBasis1D const& rhs);
 };
 
 } // namespace SPLINTER

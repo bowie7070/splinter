@@ -38,7 +38,7 @@ BSplineBasis::BSplineBasis(
     }
 }
 
-SparseVector BSplineBasis::eval(const DenseVector& x) const {
+SparseVector BSplineBasis::eval(DenseVector const& x) const {
     // Evaluate basisfunctions for each variable i and compute the tensor product of the function values
     std::vector<SparseVector> basisFunctionValues;
 
@@ -314,7 +314,7 @@ BSplineBasis::reduceSupport(std::vector<double>& lb, std::vector<double>& ub) {
 
 std::vector<unsigned int> BSplineBasis::getBasisDegrees() const {
     std::vector<unsigned int> degrees;
-    for (const auto& basis : bases)
+    for (auto const& basis : bases)
         degrees.push_back(basis.getBasisDegree());
     return degrees;
 }

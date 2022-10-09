@@ -26,7 +26,7 @@ public:
     DataPoint(DenseVector x, double y);
 
     bool
-    operator<(const DataPoint& rhs) const; // Returns false if the two are equal
+    operator<(DataPoint const& rhs) const; // Returns false if the two are equal
 
     std::vector<double> getX() const { return x; }
     double getY() const { return y; }
@@ -37,7 +37,7 @@ private:
 
     std::vector<double> x;
     double y;
-    void setData(const std::vector<double>& x, double y);
+    void setData(std::vector<double> const& x, double y);
 
     friend class Serializer;
 };

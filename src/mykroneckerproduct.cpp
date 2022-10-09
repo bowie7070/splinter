@@ -19,7 +19,7 @@ namespace SPLINTER {
  * See: https://forum.kde.org/viewtopic.php?f=74&t=106955&p=309990&hilit=kronecker#p309990
  * When Eigen update their implementation, and officially support it, we switch to that.
  */
-SparseMatrix myKroneckerProduct(const SparseMatrix& A, const SparseMatrix& B) {
+SparseMatrix myKroneckerProduct(SparseMatrix const& A, SparseMatrix const& B) {
     SparseMatrix AB(A.rows() * B.rows(), A.cols() * B.cols());
 
     // Reserve memory for AB
@@ -84,7 +84,7 @@ SparseMatrix myKroneckerProduct(const SparseMatrix& A, const SparseMatrix& B) {
     return AB;
 }
 
-SparseVector kroneckerProductVectors(const std::vector<SparseVector>& vectors) {
+SparseVector kroneckerProductVectors(std::vector<SparseVector> const& vectors) {
     // Create two temp matrices
     SparseMatrix temp1(1, 1);
     temp1.insert(0, 0) = 1;
@@ -92,7 +92,7 @@ SparseVector kroneckerProductVectors(const std::vector<SparseVector>& vectors) {
 
     // Multiply from left
     int counter = 0;
-    for (const auto& vec : vectors) {
+    for (auto const& vec : vectors) {
         // Avoid copy
         if (counter % 2 == 0)
             temp1 = kroneckerProduct(temp2, vec);
@@ -108,7 +108,7 @@ SparseVector kroneckerProductVectors(const std::vector<SparseVector>& vectors) {
     return temp1;
 }
 
-DenseVector kroneckerProductVectors(const std::vector<DenseVector>& vectors) {
+DenseVector kroneckerProductVectors(std::vector<DenseVector> const& vectors) {
     // Create two temp matrices
     DenseVector temp1(1);
     temp1(0)          = 1;
@@ -116,7 +116,7 @@ DenseVector kroneckerProductVectors(const std::vector<DenseVector>& vectors) {
 
     // Multiply from left
     int counter = 0;
-    for (const auto& vec : vectors) {
+    for (auto const& vec : vectors) {
         // Avoid copy
         if (counter % 2 == 0)
             temp1 = kroneckerProduct(temp2, vec);
@@ -133,7 +133,7 @@ DenseVector kroneckerProductVectors(const std::vector<DenseVector>& vectors) {
 }
 
 SparseMatrix
-kroneckerProductMatrices(const std::vector<SparseMatrix>& matrices) {
+kroneckerProductMatrices(std::vector<SparseMatrix> const& matrices) {
     // Create two temp matrices
     SparseMatrix temp1(1, 1);
     temp1.insert(0, 0) = 1;
@@ -141,7 +141,7 @@ kroneckerProductMatrices(const std::vector<SparseMatrix>& matrices) {
 
     // Multiply from left
     int counter = 0;
-    for (const auto& mat : matrices) {
+    for (auto const& mat : matrices) {
         // Avoid copy
         if (counter % 2 == 0)
             temp1 = kroneckerProduct(temp2, mat);

@@ -15,10 +15,10 @@
 namespace SPLINTER {
 
 // Knot vector related
-bool isKnotVectorRegular(const std::vector<double>& knots, unsigned int degree);
-bool isKnotVectorClamped(const std::vector<double>& knots, unsigned int degree);
+bool isKnotVectorRegular(std::vector<double> const& knots, unsigned int degree);
+bool isKnotVectorClamped(std::vector<double> const& knots, unsigned int degree);
 bool isKnotVectorRefinement(
-    const std::vector<double>& knots, const std::vector<double>& refinedKnots);
+    std::vector<double> const& knots, std::vector<double> const& refinedKnots);
 
 } // namespace SPLINTER
 

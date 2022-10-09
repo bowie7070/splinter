@@ -18,7 +18,7 @@ namespace SPLINTER {
 BSplineBasis1D::BSplineBasis1D() {}
 
 BSplineBasis1D::BSplineBasis1D(
-    const std::vector<double>& knots, unsigned int degree) :
+    std::vector<double> const& knots, unsigned int degree) :
     degree(degree),
     knots(knots),
     targetNumBasisfunctions((degree + 1) + 2 * degree + 1) // Minimum p+1
@@ -384,7 +384,7 @@ SparseMatrix BSplineBasis1D::decomposeToBezierForm() {
 }
 
 SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
-    const std::vector<double>& refinedKnots) const {
+    std::vector<double> const& refinedKnots) const {
     if (!isKnotVectorRegular(refinedKnots, degree))
         throw Exception(
             "BSplineBasis1D::buildKnotInsertionMatrix: New knot vector is not regular!");
@@ -561,7 +561,7 @@ unsigned int BSplineBasis1D::indexLongestInterval() const {
 }
 
 unsigned int
-BSplineBasis1D::indexLongestInterval(const std::vector<double>& vec) const {
+BSplineBasis1D::indexLongestInterval(std::vector<double> const& vec) const {
     double longest     = 0;
     double interval    = 0;
     unsigned int index = 0;

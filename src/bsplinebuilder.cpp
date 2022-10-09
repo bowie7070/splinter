@@ -17,7 +17,7 @@
 
 namespace SPLINTER {
 // Default constructor
-BSpline::Builder::Builder(const DataTable& data) :
+BSpline::Builder::Builder(DataTable const& data) :
     _data(data),
     _degrees(getBSplineDegrees(data.getNumVariables(), 3)),
     _numBasisFunctions(std::vector<unsigned int>(data.getNumVariables(), 0)),
@@ -59,7 +59,7 @@ BSpline BSpline::Builder::build() const {
  * alpha = regularization parameter.
  */
 DenseVector
-BSpline::Builder::computeCoefficients(const BSpline& bspline) const {
+BSpline::Builder::computeCoefficients(BSpline const& bspline) const {
     SparseMatrix B = computeBasisFunctionMatrix(bspline);
     SparseMatrix A = B;
     DenseVector b  = getSamplePointValues();
@@ -159,7 +159,7 @@ BSpline::Builder::computeCoefficients(const BSpline& bspline) const {
 }
 
 SparseMatrix
-BSpline::Builder::computeBasisFunctionMatrix(const BSpline& bspline) const {
+BSpline::Builder::computeBasisFunctionMatrix(BSpline const& bspline) const {
     unsigned int numVariables = _data.getNumVariables();
     unsigned int numSamples   = _data.getNumSamples();
 
@@ -205,7 +205,7 @@ DenseVector BSpline::Builder::getSamplePointValues() const {
 * (approximate) second derivative in control point calculation for P-splines.
 */
 SparseMatrix BSpline::Builder::getSecondOrderFiniteDifferenceMatrix(
-    const BSpline& bspline) const {
+    BSpline const& bspline) const {
     unsigned int numVariables = bspline.getNumVariables();
 
     // Number of (total) basis functions - defines the number of columns in D
@@ -320,7 +320,7 @@ std::vector<std::vector<double>> BSpline::Builder::computeKnotVectors() const {
 
 // Compute a single knot vector from sample grid and degree
 std::vector<double> BSpline::Builder::computeKnotVector(
-    const std::vector<double>& values,
+    std::vector<double> const& values,
     unsigned int degree,
     unsigned int numBasisFunctions) const {
     switch (_knotSpacing) {
@@ -366,7 +366,7 @@ std::vector<double> BSpline::Builder::computeKnotVector(
 * samples are added to buckets and the knots computed as the average of these.
 */
 std::vector<double> BSpline::Builder::knotVectorMovingAverage(
-    const std::vector<double>& values, unsigned int degree) const {
+    std::vector<double> const& values, unsigned int degree) const {
     // Sort and remove duplicates
     std::vector<double> unique = extractUniqueSorted(values);
 
@@ -412,7 +412,7 @@ std::vector<double> BSpline::Builder::knotVectorMovingAverage(
 }
 
 std::vector<double> BSpline::Builder::knotVectorEquidistant(
-    const std::vector<double>& values,
+    std::vector<double> const& values,
     unsigned int degree,
     unsigned int numBasisFunctions = 0) const {
     // Sort and remove duplicates
@@ -456,7 +456,7 @@ std::vector<double> BSpline::Builder::knotVectorEquidistant(
 }
 
 std::vector<double> BSpline::Builder::knotVectorBuckets(
-    const std::vector<double>& values,
+    std::vector<double> const& values,
     unsigned int degree,
     unsigned int maxSegments) const {
     // Sort and remove duplicates
@@ -533,7 +533,7 @@ std::vector<double> BSpline::Builder::knotVectorBuckets(
 }
 
 std::vector<double>
-BSpline::Builder::extractUniqueSorted(const std::vector<double>& values) const {
+BSpline::Builder::extractUniqueSorted(std::vector<double> const& values) const {
     // Sort and remove duplicates
     std::vector<double> unique(values);
     std::sort(unique.begin(), unique.end());

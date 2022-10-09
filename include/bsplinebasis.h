@@ -23,7 +23,7 @@ public:
         std::vector<unsigned int> basisDegrees);
 
     // Evaluation
-    SparseVector eval(const DenseVector& x) const;
+    SparseVector eval(DenseVector const& x) const;
     DenseMatrix evalBasisJacobianOld(DenseVector& x) const; // Depricated
     SparseMatrix evalBasisJacobian(DenseVector& x) const;
     SparseMatrix evalBasisJacobian2(
@@ -67,7 +67,7 @@ private:
     unsigned int numVariables;
 
     friend class Serializer;
-    friend bool operator==(const BSplineBasis& lhs, const BSplineBasis& rhs);
+    friend bool operator==(BSplineBasis const& lhs, BSplineBasis const& rhs);
 };
 
 } // namespace SPLINTER

@@ -11,7 +11,7 @@
 
 namespace SPLINTER {
 
-std::vector<double> denseVectorToVector(const DenseVector& denseVec) {
+std::vector<double> denseVectorToVector(DenseVector const& denseVec) {
     std::vector<double> vec(denseVec.size());
 
     for (size_t i = 0; i < (size_t)denseVec.size(); ++i) {
@@ -21,7 +21,7 @@ std::vector<double> denseVectorToVector(const DenseVector& denseVec) {
     return vec;
 }
 
-DenseVector vectorToDenseVector(const std::vector<double>& vec) {
+DenseVector vectorToDenseVector(std::vector<double> const& vec) {
     DenseVector denseVec(vec.size());
 
     for (size_t i = 0; i < vec.size(); ++i) {
@@ -32,7 +32,7 @@ DenseVector vectorToDenseVector(const std::vector<double>& vec) {
 }
 
 std::vector<std::vector<double>>
-denseMatrixToVectorVector(const DenseMatrix& mat) {
+denseMatrixToVectorVector(DenseMatrix const& mat) {
     std::vector<std::vector<double>> vec(mat.rows());
 
     for (size_t i = 0; i < (size_t)mat.rows(); ++i) {
@@ -45,7 +45,7 @@ denseMatrixToVectorVector(const DenseMatrix& mat) {
 }
 
 DenseMatrix
-vectorVectorToDenseMatrix(const std::vector<std::vector<double>>& vec) {
+vectorVectorToDenseMatrix(std::vector<std::vector<double>> const& vec) {
     size_t numRows = vec.size();
     size_t numCols = numRows > 0 ? vec.at(0).size() : 0;
 
