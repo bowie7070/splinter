@@ -15,39 +15,6 @@
 
 namespace SPLINTER {
 
-SparseVector BSplineBasis1D::eval(double x) const {
-    SparseVector values(getNumBasisFunctions());
-
-    clamp_inside_support(x);
-
-    // Evaluate nonzero basis functions
-    indexSupportedBasisfunctions(x, [&](int const first, int const last) {
-        values.reserve(last - first + 1);
-        for (int i = first; i <= last; ++i) {
-            double const val = deBoorCox(x, i, degree);
-            if (fabs(val) > 1e-12) {
-                values.insert(i) = val;
-            }
-        }
-    });
-
-    // Alternative evaluation using basis matrix
-    //    int knotIndex = indexHalfopenInterval(x); // knot index
-
-    //    SparseMatrix basisvalues2 = buildBsplineMatrix(x, knotIndex, 1);
-    //    for (int i = 2; i <= basisDegree; i++)
-    //    {
-    //        SparseMatrix Ri = buildBsplineMatrix(x, knotIndex, i);
-    //        basisvalues2 = basisvalues2*Ri;
-    //    }
-    //    basisvalues2.makeCompressed();
-
-    //    assert(basisvalues2.rows() == 1);
-    //    assert(basisvalues2.cols() == basisDegree + 1);
-
-    return values;
-}
-
 SparseVector BSplineBasis1D::evalDerivative(double x, int r) const {
     // Evaluate rth derivative of basis functions at x
     // Returns vector [D^(r)B_(u-p,p)(x) ... D^(r)B_(u,p)(x)]

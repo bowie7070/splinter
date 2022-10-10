@@ -25,7 +25,31 @@ public:
     }
 
     // Evaluation of basis functions
-    SparseVector eval(double x) const;
+    void eval(double x, SparseVector& values) const {
+        values.resize(getNumBasisFunctions());
+
+        clamp_inside_support(x);
+
+        // Evaluate nonzero basis functions
+        indexSupportedBasisfunctions(x, [&](int const first, int const last) {
+            values.reserve(last - first + 1);
+            for (int i = first; i <= last; ++i) {
+                double const val = deBoorCox(x, i, degree);
+                if (fabs(val) > 1e-12) {
+                    values.insert(i) = val;
+                }
+            }
+        });
+    }
+
+    SparseVector eval(double x) const {
+        SparseVector values;
+
+        eval(x, values);
+
+        return values;
+    }
+
     SparseVector evalDerivative(double x, int r) const;
     SparseVector evalFirstDerivative(double x) const; // Depricated
 
@@ -125,7 +149,6 @@ private:
     buildKnotInsertionMatrix(std::vector<double> const& refinedKnots) const;
 
     // Helper functions
-    
 
     // Member variables
     unsigned int degree;
