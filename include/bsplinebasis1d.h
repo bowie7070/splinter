@@ -11,6 +11,7 @@
 #define SPLINTER_BSPLINEBASIS1D_H
 
 #include "definitions.h"
+#include <knots.h>
 
 namespace SPLINTER {
 

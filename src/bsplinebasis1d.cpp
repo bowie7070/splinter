@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <bsplinebasis1d.h>
 #include <iostream>
-#include <knots.h>
 #include <utilities.h>
 
 namespace SPLINTER {
