@@ -7,21 +7,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <catch2/catch_all.hpp>
 #include <bsplinebasis1d.h>
+#include <catch2/catch_all.hpp>
 
 using namespace SPLINTER;
 
 #define COMMON_TAGS "[unit][bsplinebasis1d]"
 #define COMMON_TEXT " unit test"
 
-TEST_CASE("supportHack" COMMON_TEXT, COMMON_TAGS)
-{
+TEST_CASE("supportHack" COMMON_TEXT, COMMON_TAGS) {
     std::vector<double> knots = {1, 1, 1, 2.1, 3.1, 4, 4, 4};
-    BSplineBasis1D bb(knots, 2);
+    BSplineBasis1D<2> bb(knots);
 
     double x = 4;
     bb.supportHack(x);
     REQUIRE(x < 4);
 }
-

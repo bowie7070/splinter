@@ -14,11 +14,13 @@
 #include "definitions.h"
 #include "mykroneckerproduct.h"
 #include <unsupported/Eigen/KroneckerProduct>
+#include <variant>
 
 namespace SPLINTER {
 
 struct basis1d_eval_uncached {
-    SparseVector operator()(BSplineBasis1D const& basis, int, double x) const {
+    template <class B>
+    SparseVector operator()(B const& basis, int, double x) const {
         return basis.eval(x);
     }
 };
@@ -27,8 +29,8 @@ template <class cache_type = std::map<std::tuple<int, double>, SparseVector>>
 struct basis1d_eval_cached {
     mutable cache_type cache;
 
-    SparseVector const&
-    operator()(BSplineBasis1D const& basis, int i, double x) const {
+    template <class B>
+    SparseVector const& operator()(B const& basis, int i, double x) const {
         auto pos = cache.find({i, x});
         if (pos == cache.end()) {
             std::tie(pos, std::ignore) = cache.insert({{i, x}, basis.eval(x)});
@@ -39,41 +41,77 @@ struct basis1d_eval_cached {
 
 class BSplineBasis {
 public:
+    template <unsigned d>
+    using bases_type = std::vector<BSplineBasis1D<d>>;
+
+    using var = std::variant<
+        bases_type<1>,
+        bases_type<2>,
+        bases_type<3>,
+        bases_type<4>,
+        bases_type<5>>;
+
+    static var representation(unsigned degree) {
+        switch (degree) {
+        case 1:
+            return bases_type<1>{};
+        case 2:
+            return bases_type<2>{};
+        case 3:
+            return bases_type<3>{};
+        case 4:
+            return bases_type<4>{};
+        case 5:
+            return bases_type<5>{};
+        }
+    }
+
     BSplineBasis(
         std::vector<std::vector<double>> const& knotVectors,
-        unsigned int basisDegrees) {
+        unsigned int basisDegrees) :
+        bases_{representation(basisDegrees)} {
         unsigned int numVariables = knotVectors.size();
 
         // Set univariate bases
-        bases.clear();
-        for (unsigned int i = 0; i < numVariables; i++) {
-            bases.push_back(BSplineBasis1D(knotVectors[i], basisDegrees));
+        std::visit(
+            [&](auto& bases) {
+                for (unsigned int i = 0; i < numVariables; i++) {
+                    bases.emplace_back(knotVectors[i]);
 
-            // Adjust target number of basis functions used in e.g. refinement
-            if (numVariables > 2) {
-                // One extra knot is allowed
-                bases[i].setNumBasisFunctionsTarget(
-                    (basisDegrees + 1) + 1); // Minimum degree+1
-            }
-        }
+                    // Adjust target number of basis functions used in e.g. refinement
+                    if (numVariables > 2) {
+                        // One extra knot is allowed
+                        bases[i].setNumBasisFunctionsTarget(
+                            (basisDegrees + 1) + 1); // Minimum degree+1
+                    }
+                }
+            },
+            bases_);
     }
 
     // Evaluation
     template <class x_type, class eval_fn, class callable>
     auto eval(x_type const& x, eval_fn& eval, callable tail) const {
         if constexpr (std::is_floating_point_v<x_type>) {
-            return tail(eval(bases[0], 0, x));
+            return std::visit(
+                [&](auto& bases) { return tail(eval(bases[0], 0, x)); },
+                bases_);
         } else {
-            assert(!bases.empty());
+            return std::visit(
+                [&](auto& bases) {
+                    assert(!bases.empty());
 
-            SparseVector product = eval(bases[0], 0, x[0]);
+                    SparseVector product = eval(bases[0], 0, x[0]);
 
-            for (int i = 1, I = getNumVariables(); i < I; ++i) {
-                product =
-                    kroneckerProduct(product, eval(bases[i], i, x[i])).eval();
-            }
+                    for (int i = 1, I = getNumVariables(); i < I; ++i) {
+                        product =
+                            kroneckerProduct(product, eval(bases[i], i, x[i]))
+                                .eval();
+                    }
 
-            return tail(std::move(product));
+                    return tail(std::move(product));
+                },
+                bases_);
         }
     }
 
@@ -83,28 +121,32 @@ public:
         DenseMatrix J;
         J.setZero(getNumBasisFunctions(), numVariables);
 
-        // Calculate partial derivatives
-        for (unsigned int i = 0; i < numVariables; i++) {
-            // One column in basis jacobian
-            DenseVector bi;
-            bi.setOnes(1);
-            for (unsigned int j = 0; j < numVariables; j++) {
-                DenseVector temp = bi;
-                DenseVector xi;
-                if (j == i) {
-                    // Differentiated basis
-                    xi = bases[j].evalFirstDerivative(x(j));
-                } else {
-                    // Normal basis
-                    xi = bases[j].eval(x(j));
+        std::visit(
+            [&](auto& bases) {
+                // Calculate partial derivatives
+                for (unsigned int i = 0; i < numVariables; i++) {
+                    // One column in basis jacobian
+                    DenseVector bi;
+                    bi.setOnes(1);
+                    for (unsigned int j = 0; j < numVariables; j++) {
+                        DenseVector temp = bi;
+                        DenseVector xi;
+                        if (j == i) {
+                            // Differentiated basis
+                            xi = bases[j].evalFirstDerivative(x(j));
+                        } else {
+                            // Normal basis
+                            xi = bases[j].eval(x(j));
+                        }
+
+                        bi = kroneckerProduct(temp, xi);
+                    }
+
+                    // Fill out column
+                    J.block(0, i, bi.rows(), 1) = bi.block(0, 0, bi.rows(), 1);
                 }
-
-                bi = kroneckerProduct(temp, xi);
-            }
-
-            // Fill out column
-            J.block(0, i, bi.rows(), 1) = bi.block(0, 0, bi.rows(), 1);
-        }
+            },
+            bases_);
 
         return J;
     }
@@ -117,31 +159,35 @@ public:
         SparseMatrix J(getNumBasisFunctions(), numVariables);
         //J.setZero(numBasisFunctions(), numInputs);
 
-        // Calculate partial derivatives
-        for (unsigned int i = 0; i < numVariables; ++i) {
-            // One column in basis jacobian
-            std::vector<SparseVector> values(numVariables);
+        std::visit(
+            [&](auto& bases) {
+                // Calculate partial derivatives
+                for (unsigned int i = 0; i < numVariables; ++i) {
+                    // One column in basis jacobian
+                    std::vector<SparseVector> values(numVariables);
 
-            for (unsigned int j = 0; j < numVariables; ++j) {
-                if (j == i) {
-                    // Differentiated basis
-                    values[j] = bases[j].evalDerivative(x(j), 1);
-                } else {
-                    // Normal basis
-                    values[j] = bases[j].eval(x(j));
+                    for (unsigned int j = 0; j < numVariables; ++j) {
+                        if (j == i) {
+                            // Differentiated basis
+                            values[j] = bases[j].evalDerivative(x(j), 1);
+                        } else {
+                            // Normal basis
+                            values[j] = bases[j].eval(x(j));
+                        }
+                    }
+
+                    SparseVector Ji = kroneckerProductVectors(values);
+
+                    // Fill out column
+                    assert(Ji.outerSize() == 1);
+                    for (SparseVector::InnerIterator it(Ji); it; ++it) {
+                        if (it.value() != 0)
+                            J.insert(it.row(), i) = it.value();
+                    }
+                    //J.block(0,i,Ji.rows(),1) = bi.block(0,0,Ji.rows(),1);
                 }
-            }
-
-            SparseVector Ji = kroneckerProductVectors(values);
-
-            // Fill out column
-            assert(Ji.outerSize() == 1);
-            for (SparseVector::InnerIterator it(Ji); it; ++it) {
-                if (it.value() != 0)
-                    J.insert(it.row(), i) = it.value();
-            }
-            //J.block(0,i,Ji.rows(),1) = bi.block(0,0,Ji.rows(),1);
-        }
+            },
+            bases_);
 
         J.makeCompressed();
 
@@ -160,13 +206,19 @@ public:
     insertKnots(double tau, unsigned int dim, unsigned int multiplicity = 1);
 
     // Getters
-    unsigned int getNumVariables() const { return bases.size(); }
-
-    std::vector<double> const& getKnotVector(int dim) const {
-        return bases[dim].getKnotVector();
+    unsigned int getNumVariables() const {
+        return std::visit([&](auto& bases) { return bases.size(); }, bases_);
     }
 
-    unsigned int getBasisDegree() const { return bases[0].getBasisDegree(); }
+    unsigned int getBasisDegree() const {
+        return std::visit([&](auto& bases) { return bases[0].degree; }, bases_);
+    }
+
+    std::vector<double> const& getKnotVector(int dim) const {
+        return std::visit(
+            [&](auto& bases) -> auto const& { return bases[dim].getKnotVector(); },
+            bases_);
+    }
 
     unsigned int getNumBasisFunctions() const;
     unsigned int getNumBasisFunctions(unsigned int dim) const;
@@ -194,7 +246,7 @@ public:
     }
 
 private:
-    std::vector<BSplineBasis1D> bases;
+    var bases_;
 
     friend bool operator==(BSplineBasis const& lhs, BSplineBasis const& rhs);
 };
