@@ -63,8 +63,11 @@ public:
     SparseMatrix decomposeToBezierForm();
     SparseMatrix insertKnots(double tau, unsigned int multiplicity = 1);
     // bool insertKnots(SparseMatrix &A, std::vector<tuple<double,int>> newKnots); // Add knots at several locations
-    unsigned int knotMultiplicity(double tau)
-        const; // Returns the number of repetitions of tau in the knot vector
+
+    // Returns the number of repetitions of tau in the knot vector
+    unsigned int knotMultiplicity(double tau) const {
+        return std::count(knots.begin(), knots.end(), tau);
+    }
 
     /*
  * The B-spline domain is the half-open domain [ knots.first(), knots.end() ).
@@ -99,8 +102,12 @@ public:
     double knot_front() const { return knots.front(); }
     double knot_back() const { return knots.back(); }
     double getKnotValue(unsigned int index) const { return knots[index]; }
-    unsigned int getNumBasisFunctions() const;
-    unsigned int getNumBasisFunctionsTarget() const;
+    unsigned int getNumBasisFunctions() const {
+        return knots.size() - (degree + 1);
+    }
+    unsigned int getNumBasisFunctionsTarget() const {
+        return targetNumBasisfunctions;
+    }
 
     // Index getters
 
@@ -588,18 +595,6 @@ inline SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     knots = si;
 
     return A;
-}
-
-inline unsigned int BSplineBasis1D::knotMultiplicity(double tau) const {
-    return std::count(knots.begin(), knots.end(), tau);
-}
-
-inline unsigned int BSplineBasis1D::getNumBasisFunctions() const {
-    return knots.size() - (degree + 1);
-}
-
-inline unsigned int BSplineBasis1D::getNumBasisFunctionsTarget() const {
-    return targetNumBasisfunctions;
 }
 
 inline unsigned int BSplineBasis1D::indexLongestInterval() const {
