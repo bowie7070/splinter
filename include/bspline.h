@@ -84,7 +84,6 @@ public:
         return basis.getNumBasisFunctions();
     }
 
-    std::vector<std::vector<double>> getKnotVectors() const;
     std::vector<double> getDomainUpperBound() const;
     std::vector<double> getDomainLowerBound() const;
 

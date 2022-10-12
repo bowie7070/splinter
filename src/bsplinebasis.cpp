@@ -243,15 +243,6 @@ std::vector<double> BSplineBasis::getKnotVector(int dim) const {
     return bases[dim].getKnotVector();
 }
 
-std::vector<std::vector<double>> BSplineBasis::getKnotVectors() const {
-    auto const numVariables = getNumVariables();
-
-    std::vector<std::vector<double>> knots;
-    for (unsigned int i = 0; i < numVariables; i++)
-        knots.push_back(bases[i].getKnotVector());
-    return knots;
-}
-
 unsigned int
 BSplineBasis::getKnotMultiplicity(unsigned int dim, double tau) const {
     return bases[dim].knotMultiplicity(tau);

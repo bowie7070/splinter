@@ -120,10 +120,6 @@ SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
     return Bi.sparseView();
 }
 
-std::vector<std::vector<double>> BSpline::getKnotVectors() const {
-    return basis.getKnotVectors();
-}
-
 std::vector<double> BSpline::getDomainUpperBound() const {
     return basis.getSupportUpperBound();
 }
