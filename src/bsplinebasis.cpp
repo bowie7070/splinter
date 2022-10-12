@@ -301,8 +301,7 @@ std::vector<double> BSplineBasis::getSupportLowerBound() const {
 
     std::vector<double> lb;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        std::vector<double> knots = bases[dim].getKnotVector();
-        lb.push_back(knots.front());
+        lb.push_back(bases[dim].knot_front());
     }
     return lb;
 }
@@ -312,8 +311,7 @@ std::vector<double> BSplineBasis::getSupportUpperBound() const {
 
     std::vector<double> ub;
     for (unsigned int dim = 0; dim < numVariables; dim++) {
-        std::vector<double> knots = bases[dim].getKnotVector();
-        ub.push_back(knots.back());
+        ub.push_back(bases[dim].knot_back());
     }
     return ub;
 }
