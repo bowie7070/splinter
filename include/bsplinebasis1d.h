@@ -96,7 +96,7 @@ public:
     // Getters
     std::vector<double> getKnotVector() const { return knots; }
     unsigned int getBasisDegree() const { return degree; }
-    double getKnotValue(unsigned int index) const;
+    double getKnotValue(unsigned int index) const { return knots[index]; }
     unsigned int getNumBasisFunctions() const;
     unsigned int getNumBasisFunctionsTarget() const;
 
@@ -471,7 +471,7 @@ inline SparseMatrix BSplineBasis1D::decomposeToBezierForm() {
     return A;
 }
 
-inline  SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
+inline SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
     std::vector<double> const& refinedKnots) const {
     assert(isKnotVectorRegular(refinedKnots, degree));
 
@@ -586,10 +586,6 @@ inline SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     knots = si;
 
     return A;
-}
-
-inline double BSplineBasis1D::getKnotValue(unsigned int index) const {
-    return knots[index];
 }
 
 inline unsigned int BSplineBasis1D::knotMultiplicity(double tau) const {
