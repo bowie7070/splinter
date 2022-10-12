@@ -221,17 +221,6 @@ BSplineBasis::reduceSupport(std::vector<double>& lb, std::vector<double>& ub) {
     return A;
 }
 
-std::vector<unsigned int> BSplineBasis::getBasisDegrees() const {
-    std::vector<unsigned int> degrees;
-    for (auto const& basis : bases)
-        degrees.push_back(basis.getBasisDegree());
-    return degrees;
-}
-
-unsigned int BSplineBasis::getBasisDegree(unsigned int dim) const {
-    return bases[dim].getBasisDegree();
-}
-
 unsigned int BSplineBasis::getNumBasisFunctions(unsigned int dim) const {
     return bases[dim].getNumBasisFunctions();
 }

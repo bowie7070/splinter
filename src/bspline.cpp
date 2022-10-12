@@ -26,11 +26,10 @@ DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
 
         for (unsigned int j = 0; j < basis.getNumBasisFunctions(i); j++) {
             double knotAvg = 0;
-            for (unsigned int k = j + 1; k <= j + basis.getBasisDegree(i);
-                 k++) {
+            for (unsigned int k = j + 1; k <= j + basis.getBasisDegree(); k++) {
                 knotAvg += knots[k];
             }
-            mu(j) = knotAvg / basis.getBasisDegree(i);
+            mu(j) = knotAvg / basis.getBasisDegree();
         }
         mu_vectors.push_back(mu);
     }
@@ -123,10 +122,6 @@ SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
 
 std::vector<std::vector<double>> BSpline::getKnotVectors() const {
     return basis.getKnotVectors();
-}
-
-std::vector<unsigned int> BSpline::getBasisDegrees() const {
-    return basis.getBasisDegrees();
 }
 
 std::vector<double> BSpline::getDomainUpperBound() const {
@@ -223,8 +218,8 @@ void BSpline::regularizeKnotVectors(
         throw Exception(
             "BSpline::regularizeKnotVectors: Inconsistent vector sizes.");
 
+    unsigned int multiplicityTarget = basis.getBasisDegree() + 1;
     for (unsigned int dim = 0; dim < getNumVariables(); dim++) {
-        unsigned int multiplicityTarget = basis.getBasisDegree(dim) + 1;
 
         // Inserting many knots at the time (to save number of B-spline coefficient calculations)
         // NOTE: This method generates knot insertion matrices with more nonzero elements than
@@ -264,29 +259,7 @@ bool BSpline::removeUnsupportedBasisFunctions(
 }
 
 std::string BSpline::getDescription() const {
-    std::string description("BSpline of degree");
-    auto degrees = getBasisDegrees();
-    // See if all degrees are the same.
-    bool equal = true;
-    for (size_t i = 1; i < degrees.size(); ++i) {
-        equal = equal && (degrees[i] == degrees[i - 1]);
-    }
-
-    if (equal) {
-        description.append(" ");
-        description.append(std::to_string(degrees[0]));
-    } else {
-        description.append("s (");
-        for (size_t i = 0; i < degrees.size(); ++i) {
-            description.append(std::to_string(degrees[i]));
-            if (i + 1 < degrees.size()) {
-                description.append(", ");
-            }
-        }
-        description.append(")");
-    }
-
-    return description;
+    return "BSpline of degree " + std::to_string(basis.getBasisDegree());
 }
 
 } // namespace SPLINTER

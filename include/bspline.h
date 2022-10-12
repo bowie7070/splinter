@@ -85,7 +85,6 @@ public:
     }
 
     std::vector<std::vector<double>> getKnotVectors() const;
-    std::vector<unsigned int> getBasisDegrees() const;
     std::vector<double> getDomainUpperBound() const;
     std::vector<double> getDomainLowerBound() const;
 

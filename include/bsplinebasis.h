@@ -166,8 +166,8 @@ public:
     std::vector<std::vector<double>> getKnotVectors() const;
     std::vector<double> getKnotVector(int dim) const;
 
-    std::vector<unsigned int> getBasisDegrees() const;
-    unsigned int getBasisDegree(unsigned int dim) const;
+    unsigned int getBasisDegree() const { return bases[0].getBasisDegree(); }
+
     unsigned int getNumBasisFunctions() const;
     unsigned int getNumBasisFunctions(unsigned int dim) const;
     std::vector<unsigned int> getNumBasisFunctionsTarget() const;
