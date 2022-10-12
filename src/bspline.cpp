@@ -21,7 +21,7 @@ DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
     // Calculate knot averages for each knot vector
     std::vector<DenseVector> mu_vectors;
     for (unsigned int i = 0; i < basis.getNumVariables(); i++) {
-        std::vector<double> knots = basis.getKnotVector(i);
+        auto const& knots = basis.getKnotVector(i);
         DenseVector mu = DenseVector::Zero(basis.getNumBasisFunctions(i));
 
         for (unsigned int j = 0; j < basis.getNumBasisFunctions(i); j++) {

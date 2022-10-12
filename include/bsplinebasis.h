@@ -163,7 +163,9 @@ public:
     unsigned int getNumVariables() const { return bases.size(); }
 
     BSplineBasis1D getSingleBasis(int dim);
-    std::vector<double> getKnotVector(int dim) const;
+    std::vector<double> const& getKnotVector(int dim) const {
+        return bases[dim].getKnotVector();
+    }
 
     unsigned int getBasisDegree() const { return bases[0].getBasisDegree(); }
 

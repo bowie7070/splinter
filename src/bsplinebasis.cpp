@@ -239,10 +239,6 @@ BSplineBasis1D BSplineBasis::getSingleBasis(int dim) {
     return bases[dim];
 }
 
-std::vector<double> BSplineBasis::getKnotVector(int dim) const {
-    return bases[dim].getKnotVector();
-}
-
 unsigned int
 BSplineBasis::getKnotMultiplicity(unsigned int dim, double tau) const {
     return bases[dim].knotMultiplicity(tau);
