@@ -235,10 +235,6 @@ unsigned int BSplineBasis::getNumBasisFunctions() const {
     return prod;
 }
 
-BSplineBasis1D BSplineBasis::getSingleBasis(int dim) {
-    return bases[dim];
-}
-
 unsigned int
 BSplineBasis::getKnotMultiplicity(unsigned int dim, double tau) const {
     return bases[dim].knotMultiplicity(tau);
