@@ -210,9 +210,7 @@ inline SparseVector BSplineBasis1D::evalDerivative(double x, int r) const {
     double factorial = std::tgamma(p + 1) / std::tgamma(p - r + 1);
     B                = B * factorial;
 
-    if (B.cols() != p + 1)
-        throw Exception(
-            "BSplineBasis1D::evalDerivative: Wrong number of columns of B matrix.");
+    assert(B.cols() != p + 1);
 
     // From row vector to extended column vector
     SparseVector DB(getNumBasisFunctions());
@@ -265,10 +263,7 @@ inline SparseMatrix BSplineBasis1D::buildBasisMatrix(
      * DR_k in R^(k,k+1)
      */
 
-    if (!(k >= 1 && k <= getBasisDegree())) {
-        throw Exception(
-            "BSplineBasis1D::buildBasisMatrix: Incorrect input paramaters!");
-    }
+    assert(!(k >= 1 && k <= getBasisDegree()));
 
     //    assert(u >= basisDegree + 1);
     //    assert(u < ks.size() - basisDegree);
@@ -340,13 +335,9 @@ inline double BSplineBasis1D::deBoorCox(double x, int i, int k) const {
 // Insert knots and compute knot insertion matrix (to update control points)
 inline SparseMatrix
 BSplineBasis1D::insertKnots(double tau, unsigned int multiplicity) {
-    if (!insideSupport(tau))
-        throw Exception(
-            "BSplineBasis1D::insertKnots: Cannot insert knot outside domain!");
+    assert(!insideSupport(tau));
 
-    if (knotMultiplicity(tau) + multiplicity > degree + 1)
-        throw Exception(
-            "BSplineBasis1D::insertKnots: Knot multiplicity is too high!");
+    assert(knotMultiplicity(tau) + multiplicity > degree + 1);
 
     // New knot vector
     int index = indexHalfopenInterval(tau);
@@ -393,9 +384,7 @@ inline SparseMatrix BSplineBasis1D::refineKnots() {
 }
 
 inline SparseMatrix BSplineBasis1D::refineKnotsLocally(double x) {
-    if (!insideSupport(x))
-        throw Exception(
-            "BSplineBasis1D::refineKnotsLocally: Cannot refine outside support!");
+    assert(!insideSupport(x));
 
     if (getNumBasisFunctions() >= getNumBasisFunctionsTarget() ||
         assertNear(knots.front(), knots.back())) {
@@ -508,10 +497,7 @@ inline SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
         }
 
         // Size check
-        if (R.rows() != 1 || R.cols() != (int)degree + 1) {
-            throw Exception(
-                "BSplineBasis1D::buildKnotInsertionMatrix: Incorrect matrix dimensions!");
-        }
+        assert(R.rows() != 1 || R.cols() != (int)degree + 1);
 
         // Insert row values
         int j = u - degree; // First insertion index
@@ -531,9 +517,7 @@ inline SparseMatrix BSplineBasis1D::buildKnotInsertionMatrix(
  * Returns false if x is outside support.
  */
 inline int BSplineBasis1D::indexHalfopenInterval(double x) const {
-    if (x < knots.front() || x > knots.back())
-        throw Exception(
-            "BSplineBasis1D::indexHalfopenInterval: x outside knot interval!");
+    assert(x < knots.front() || x > knots.back());
 
     // Find first knot that is larger than x
     std::vector<double>::const_iterator it =
@@ -546,9 +530,7 @@ inline int BSplineBasis1D::indexHalfopenInterval(double x) const {
 
 inline SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     // Check bounds
-    if (lb < knots.front() || ub > knots.back())
-        throw Exception(
-            "BSplineBasis1D::reduceSupport: Cannot increase support!");
+    assert(lb < knots.front() || ub > knots.back());
 
     unsigned int k = degree + 1;
 
@@ -558,12 +540,8 @@ inline SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     // Check lower bound index
     if (k != knotMultiplicity(knots[index_lower])) {
         int suggested_index = index_lower - 1;
-        if (0 <= suggested_index) {
-            index_lower = suggested_index;
-        } else {
-            throw Exception(
-                "BSplineBasis1D::reduceSupport: Suggested index is negative!");
-        }
+        assert(0 <= suggested_index);
+        index_lower = suggested_index;
     }
 
     // Check upper bound index
@@ -582,9 +560,7 @@ inline SparseMatrix BSplineBasis1D::reduceSupport(double lb, double ub) {
     int numOld = knots.size() - k; // Current number of basis functions
     int numNew = si.size() - k;    // Number of basis functions after update
 
-    if (numOld < numNew)
-        throw Exception(
-            "BSplineBasis1D::reduceSupport: Number of basis functions is increased instead of reduced!");
+    assert(numOld < numNew);
 
     DenseMatrix Ad = DenseMatrix::Zero(numOld, numNew);
     Ad.block(index_lower, 0, numNew, numNew) =
