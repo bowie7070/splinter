@@ -34,7 +34,12 @@ public:
      */
     BSpline(DenseVector coefficients, BSplineBasis);
 
-    static double as_scalar(Eigen::Vector<double, 1> x) { return x[0]; }
+    template <class x_type>
+    static double as_scalar(x_type const& x) {
+        assert(x.rows() == 1);
+        assert(x.cols() == 1);
+        return x(0, 0);
+    }
 
     template <class x_type, class eval_fn>
     double eval(x_type const& x, eval_fn& cache) const {

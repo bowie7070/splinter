@@ -64,6 +64,8 @@ public:
         case 5:
             return bases_type<5>{};
         }
+
+        std::abort();
     }
 
     BSplineBasis(
@@ -101,12 +103,14 @@ public:
                 [&](auto& bases) {
                     assert(!bases.empty());
 
-                    SparseVector product = eval(bases[0], 0, x[0]);
+                    SparseMatrix product = eval(bases[0], 0, x[0]);
+                    SparseMatrix product_prev;
 
                     for (int i = 1, I = getNumVariables(); i < I; ++i) {
-                        product =
-                            kroneckerProduct(product, eval(bases[i], i, x[i]))
-                                .eval();
+                        product.swap(product_prev);
+                        product = kroneckerProduct(
+                            product_prev,
+                            eval(bases[i], i, x[i]));
                     }
 
                     return tail(std::move(product));
@@ -216,7 +220,9 @@ public:
 
     std::vector<double> const& getKnotVector(int dim) const {
         return std::visit(
-            [&](auto& bases) -> auto const& { return bases[dim].getKnotVector(); },
+            [&](auto& bases) -> auto const& {
+                return bases[dim].getKnotVector();
+            },
             bases_);
     }
 
