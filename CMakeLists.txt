@@ -52,7 +52,8 @@ target_link_libraries(splinter PUBLIC
     Eigen3::Eigen
 )
 
-if(Catch2_FOUND)
+option(SPLINTER_ENABLE_TESTING OFF "Enable testing")
+if(SPLINTER_ENABLE_TESTING)
     # Testing executable
     add_executable(splinter-test)
     target_sources(splinter-test PRIVATE

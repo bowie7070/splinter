@@ -33,10 +33,11 @@ constexpr bool supports_duplicates_v = supports_duplicates<T>::value;
  * The samples are stored in a continuously sorted table.
  */
 
-template <class samples_type = std::multiset<DataPoint>>
+template <class samples_type, unsigned _variables>
 class SPLINTER_API _data_table {
 public:
     static constexpr bool allowDuplicates = supports_duplicates_v<samples_type>;
+    static constexpr unsigned variables   = _variables;
 
     using data_point = typename samples_type::value_type;
     using x_type     = typename data_point::x_type;
@@ -122,13 +123,12 @@ private:
     samples_type samples;
 };
 
-template <class x_type>
-using data_table_multiset_x = _data_table<std::multiset<_data_point<x_type>>>;
+template <class x_type, unsigned v>
+using data_table_multiset_x =
+    _data_table<std::multiset<_data_point<x_type>>, v>;
 
-template <class x_type>
-using data_table_set_x = _data_table<std::set<_data_point<x_type>>>;
-
-using DataTable = _data_table<>;
+template <class x_type, unsigned v>
+using data_table_set_x = _data_table<std::set<_data_point<x_type>>, v>;
 
 } // namespace SPLINTER
 

@@ -52,10 +52,11 @@ std::vector<double> extractUniqueSorted(std::vector<double> const& values);
 template <class data_table>
 class SPLINTER_API Builder {
 public:
+    static constexpr unsigned variables = data_table::variables;
+
     Builder(data_table const& data) :
         _data(data),
-        _numBasisFunctions(
-            std::vector<unsigned int>(data.getNumVariables(), 0)),
+        _numBasisFunctions(std::vector<unsigned int>(variables, 0)),
         _knotSpacing(KnotSpacing::AS_SAMPLED),
         _smoothing(Smoothing::NONE),
         _alpha(0.1) {}
@@ -72,14 +73,13 @@ public:
     // Set build options
 
     Builder& numBasisFunctions(unsigned int numBasisFunctions) {
-        _numBasisFunctions = std::vector<unsigned int>(
-            _data.getNumVariables(),
-            numBasisFunctions);
+        _numBasisFunctions =
+            std::vector<unsigned int>(variables, numBasisFunctions);
         return *this;
     }
 
     Builder& numBasisFunctions(std::vector<unsigned int> numBasisFunctions) {
-        if (numBasisFunctions.size() != _data.getNumVariables())
+        if (numBasisFunctions.size() != variables)
             throw Exception(
                 "BSpline::Builder: Inconsistent length on numBasisFunctions vector.");
         _numBasisFunctions = numBasisFunctions;
@@ -98,8 +98,8 @@ public:
 
     // Build B-spline
     template <unsigned degree = 3>
-    BSpline<degree> build() const {
-        BSplineBasis<degree> basis{computeKnotVectors(degree)};
+    BSpline<degree, variables> build() const {
+        BSplineBasis<degree, variables> basis{computeKnotVectors(degree)};
         auto coefficients = computeCoefficients(basis);
 
         return {std::move(coefficients), std::move(basis)};
@@ -118,7 +118,7 @@ private:
 
     template <class B>
     auto computeBasisFunctionMatrix(B const& basis) const {
-        unsigned int numVariables = _data.getNumVariables();
+        unsigned int numVariables = variables;
         unsigned int numSamples   = _data.getNumSamples();
 
         // TODO: Reserve nnz per row (degree+1)
@@ -254,8 +254,8 @@ private:
     * R = Regularization matrix,
     * alpha = regularization parameter.
     */
-    template <class B>
-    DenseVector computeCoefficients(B const& basis) const {
+    template <class basis_type>
+    DenseVector computeCoefficients(basis_type const& basis) const {
         auto const B = computeBasisFunctionMatrix(basis);
         matrix A;
         DenseVector b = getSamplePointValues();
@@ -355,7 +355,7 @@ private:
 
         std::vector<std::vector<double>> knotVectors;
 
-        for (unsigned int i = 0; i < _data.getNumVariables(); ++i) {
+        for (unsigned int i = 0; i < variables; ++i) {
             // Compute knot vector
             knotVectors.push_back(
                 computeKnotVector(grid[i], degree, _numBasisFunctions[i]));
