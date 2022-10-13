@@ -72,11 +72,13 @@ public:
     auto eval(x_type const& x, eval_fn& eval, callable tail) const {
         if constexpr (variables == 1) {
             return tail(eval(bases[0], 0, x));
+
         } else if constexpr (variables == 2) {
             product = kroneckerProduct(
                 eval(bases[0], 0, x[0]),
                 eval(bases[1], 1, x[1]));
             return tail(product);
+
         } else {
             assert(!bases.empty());
 
@@ -90,8 +92,10 @@ public:
                     kroneckerProduct(product_prev, eval(bases[i], i, x[i]));
             }
 
-            return tail(std::move(product));
+            return tail(product);
         }
+
+        assert(false);
     }
 
     DenseMatrix evalBasisJacobianOld(DenseVector& x) const {
