@@ -12,7 +12,6 @@
 
 #include "bsplinebasis.h"
 #include "function.h"
-#include "bsplinebasis.h"
 #include "mykroneckerproduct.h"
 #include "unsupported/Eigen/KroneckerProduct"
 #include <iostream>
@@ -24,21 +23,16 @@ namespace SPLINTER {
 /**
  * Class that implements the multivariate tensor product B-spline
  */
+template <unsigned _degree>
 class SPLINTER_API BSpline {
 public:
-    /**
-     * Builder class for construction by regression
-     * Implemented in BSplineBuilder.*
-     */
-    template <class data_table>
-    class Builder;
-    enum class Smoothing;
-    enum class KnotSpacing;
-
+    static constexpr unsigned degree = _degree;
     /**
      * Construct B-spline from knot vectors, coefficients, and basis degrees
      */
-    BSpline(DenseVector coefficients, BSplineBasis);
+    BSpline(DenseVector coefficients, BSplineBasis<degree> _basis) :
+        basis(std::move(_basis)),
+        coefficients(std::move(coefficients)) {}
 
     template <class x_type>
     static double as_scalar(x_type const& x) {
@@ -133,7 +127,7 @@ public:
     }
 
 private:
-    BSplineBasis basis;
+    BSplineBasis<degree> basis;
 
     /*
      * The control point matrix is P = (knotaverages, coefficients) in R^(m x n),
@@ -156,9 +150,9 @@ private:
     friend bool operator==(BSpline const& lhs, BSpline const& rhs);
 };
 
-
 // Computes knot averages.
-inline DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
+template <unsigned d>
+DenseMatrix computeKnotAverages(BSplineBasis<d> const& basis) {
     // Calculate knot averages for each knot vector
     std::vector<DenseVector> mu_vectors;
     for (unsigned int i = 0; i < basis.getNumVariables(); i++) {
@@ -197,21 +191,18 @@ inline DenseMatrix computeKnotAverages(BSplineBasis const& basis) {
         }
         if (mu_ext.rows() != basis.getNumBasisFunctions())
             throw Exception(
-                "BSpline::computeKnotAverages: Incompatible size of knot average matrix.");
+                "BSpline<d>::computeKnotAverages: Incompatible size of knot average matrix.");
         knot_averages.block(0, i, basis.getNumBasisFunctions(), 1) = mu_ext;
     }
 
     return knot_averages;
 }
 
-inline BSpline::BSpline(DenseVector coefficients, BSplineBasis _basis) :
-    basis(std::move(_basis)),
-    coefficients(std::move(coefficients)) {}
-
 /**
  * Returns the (1 x getNumVariables()) Jacobian evaluated at x
  */
-inline DenseMatrix BSpline::evalJacobian(DenseVector x) const {
+template <unsigned d>
+DenseMatrix BSpline<d>::evalJacobian(DenseVector x) const {
     checkInput(x);
     return coefficients.transpose() * evalBasisJacobian(x);
 }
@@ -221,13 +212,14 @@ inline DenseMatrix BSpline::evalJacobian(DenseVector x) const {
  * The Hessian is an n x n matrix,
  * where n is the dimension of x.
  */
-inline DenseMatrix BSpline::evalHessian(DenseVector x) const {
+template <unsigned d>
+DenseMatrix BSpline<d>::evalHessian(DenseVector x) const {
     checkInput(x);
 
 #ifndef NDEBUG
     if (!pointInDomain(x))
         throw Exception(
-            "BSpline::evalHessian: Evaluation at point outside domain.");
+            "BSpline<d>::evalHessian: Evaluation at point outside domain.");
 #endif // NDEBUG
 
     DenseMatrix H;
@@ -246,11 +238,12 @@ inline DenseMatrix BSpline::evalHessian(DenseVector x) const {
     return H;
 }
 
-inline SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
+template <unsigned d>
+SparseMatrix BSpline<d>::evalBasisJacobian(DenseVector x) const {
 #ifndef NDEBUG
     if (!pointInDomain(x))
         throw Exception(
-            "BSpline::evalBasisJacobian: Evaluation at point outside domain.");
+            "BSpline<d>::evalBasisJacobian: Evaluation at point outside domain.");
 #endif // NDEBUG
 
     //SparseMatrix Bi = basis.evalBasisJacobian(x);       // Sparse Jacobian implementation
@@ -261,29 +254,35 @@ inline SparseMatrix BSpline::evalBasisJacobian(DenseVector x) const {
     return Bi.sparseView();
 }
 
-inline std::vector<double> BSpline::getDomainUpperBound() const {
+template <unsigned d>
+std::vector<double> BSpline<d>::getDomainUpperBound() const {
     return basis.getSupportUpperBound();
 }
 
-inline std::vector<double> BSpline::getDomainLowerBound() const {
+template <unsigned d>
+std::vector<double> BSpline<d>::getDomainLowerBound() const {
     return basis.getSupportLowerBound();
 }
 
-inline void BSpline::updateControlPoints(DenseMatrix const& A) {
+template <unsigned d>
+void BSpline<d>::updateControlPoints(DenseMatrix const& A) {
     assert(A.cols() == coefficients.rows());
     coefficients = A * coefficients;
 }
 
-inline bool BSpline::pointInDomain(DenseVector x) const {
+template <unsigned d>
+bool BSpline<d>::pointInDomain(DenseVector x) const {
     return basis.insideSupport(x);
 }
 
-inline void BSpline::reduceSupport(
+template <unsigned d>
+void BSpline<d>::reduceSupport(
     std::vector<double> lb,
     std::vector<double> ub,
     bool doRegularizeKnotVectors) {
     if (lb.size() != getNumVariables() || ub.size() != getNumVariables())
-        throw Exception("BSpline::reduceSupport: Inconsistent vector sizes!");
+        throw Exception(
+            "BSpline<d>::reduceSupport: Inconsistent vector sizes!");
 
     std::vector<double> sl = basis.getSupportLowerBound();
     std::vector<double> su = basis.getSupportUpperBound();
@@ -292,12 +291,12 @@ inline void BSpline::reduceSupport(
         // Check if new domain is empty
         if (ub[dim] <= lb[dim] || lb[dim] >= su[dim] || ub[dim] <= sl[dim])
             throw Exception(
-                "BSpline::reduceSupport: Cannot reduce B-spline domain to empty set!");
+                "BSpline<d>::reduceSupport: Cannot reduce B-spline domain to empty set!");
 
         // Check if new domain is a strict subset
         if (su[dim] < ub[dim] || sl[dim] > lb[dim])
             throw Exception(
-                "BSpline::reduceSupport: Cannot expand B-spline domain!");
+                "BSpline<d>::reduceSupport: Cannot expand B-spline domain!");
 
         // Tightest possible
         sl[dim] = lb[dim];
@@ -311,11 +310,12 @@ inline void BSpline::reduceSupport(
     // Remove knots and control points that are unsupported with the new bounds
     if (!removeUnsupportedBasisFunctions(sl, su)) {
         throw Exception(
-            "BSpline::reduceSupport: Failed to remove unsupported basis functions!");
+            "BSpline<d>::reduceSupport: Failed to remove unsupported basis functions!");
     }
 }
 
-inline void BSpline::globalKnotRefinement() {
+template <unsigned d>
+void BSpline<d>::globalKnotRefinement() {
     // Compute knot insertion matrix
     SparseMatrix A = basis.refineKnots();
 
@@ -323,7 +323,8 @@ inline void BSpline::globalKnotRefinement() {
     updateControlPoints(A);
 }
 
-inline void BSpline::localKnotRefinement(DenseVector x) {
+template <unsigned d>
+void BSpline<d>::localKnotRefinement(DenseVector x) {
     // Compute knot insertion matrix
     SparseMatrix A = basis.refineKnotsLocally(x);
 
@@ -331,7 +332,8 @@ inline void BSpline::localKnotRefinement(DenseVector x) {
     updateControlPoints(A);
 }
 
-inline void BSpline::decomposeToBezierForm() {
+template <unsigned d>
+void BSpline<d>::decomposeToBezierForm() {
     // Compute knot insertion matrix
     SparseMatrix A = basis.decomposeToBezierForm();
 
@@ -339,8 +341,8 @@ inline void BSpline::decomposeToBezierForm() {
     updateControlPoints(A);
 }
 
-inline void
-BSpline::insertKnots(
+template <unsigned d>
+void BSpline<d>::insertKnots(
     double tau, unsigned int dim, unsigned int multiplicity) {
     // Insert knots and compute knot insertion matrix
     SparseMatrix A = basis.insertKnots(tau, dim, multiplicity);
@@ -349,14 +351,15 @@ BSpline::insertKnots(
     updateControlPoints(A);
 }
 
-inline void BSpline::regularizeKnotVectors(
+template <unsigned d>
+void BSpline<d>::regularizeKnotVectors(
     std::vector<double>& lb, std::vector<double>& ub) {
     // Add and remove controlpoints and knots to make the b-spline p-regular with support [lb, ub]
     if (!(lb.size() == getNumVariables() && ub.size() == getNumVariables()))
         throw Exception(
-            "BSpline::regularizeKnotVectors: Inconsistent vector sizes.");
+            "BSpline<d>::regularizeKnotVectors: Inconsistent vector sizes.");
 
-    unsigned int multiplicityTarget = basis.getBasisDegree() + 1;
+    unsigned int multiplicityTarget = degree + 1;
     for (unsigned int dim = 0; dim < getNumVariables(); dim++) {
 
         // Inserting many knots at the time (to save number of B-spline coefficient calculations)
@@ -379,11 +382,12 @@ inline void BSpline::regularizeKnotVectors(
     }
 }
 
-inline bool BSpline::removeUnsupportedBasisFunctions(
+template <unsigned d>
+bool BSpline<d>::removeUnsupportedBasisFunctions(
     std::vector<double>& lb, std::vector<double>& ub) {
     if (lb.size() != getNumVariables() || ub.size() != getNumVariables())
         throw Exception(
-            "BSpline::removeUnsupportedBasisFunctions: Incompatible dimension of domain bounds.");
+            "BSpline<d>::removeUnsupportedBasisFunctions: Incompatible dimension of domain bounds.");
 
     SparseMatrix A = basis.reduceSupport(lb, ub);
 
@@ -396,8 +400,9 @@ inline bool BSpline::removeUnsupportedBasisFunctions(
     return true;
 }
 
-inline std::string BSpline::getDescription() const {
-    return "BSpline of degree " + std::to_string(basis.getBasisDegree());
+template <unsigned d>
+std::string BSpline<d>::getDescription() const {
+    return "BSpline of degree " + std::to_string(d);
 }
 
 } // namespace SPLINTER

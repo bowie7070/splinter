@@ -16,7 +16,7 @@
 namespace SPLINTER {
 
 // B-spline smoothing
-enum class BSpline::Smoothing {
+enum class Smoothing {
     NONE,     // No smoothing
     IDENTITY, // Regularization term alpha*c'*I*c is added to OLS objective
     PSPLINE   // Smoothing term alpha*Delta(c,2) is added to OLS objective
@@ -28,7 +28,7 @@ enum class BSpline::Smoothing {
  * AS_SAMPLED_NOT_CLAMPED   // Place knots close to sample points. Without clamps.
  * EQUIDISTANT_NOT_CLAMPED  // Equidistant knots without clamps.
  */
-enum class BSpline::KnotSpacing {
+enum class KnotSpacing {
     AS_SAMPLED, // Mimic spacing of sample points (moving average). With clamps (p+1 multiplicity of end knots).
     EQUIDISTANT, // Equidistant knots. With clamps (p+1 multiplicity of end knots).
     EXPERIMENTAL // Experimental knot spacing (for testing purposes).
@@ -50,7 +50,7 @@ std::vector<double> extractUniqueSorted(std::vector<double> const& values);
 
 // B-spline builder class
 template <class data_table>
-class SPLINTER_API BSpline::Builder {
+class SPLINTER_API Builder {
 public:
     Builder(data_table const& data) :
         _data(data),
@@ -70,11 +70,6 @@ public:
     }
 
     // Set build options
-
-    Builder& degree(unsigned int degree) {
-        _degree = degree;
-        return *this;
-    }
 
     Builder& numBasisFunctions(unsigned int numBasisFunctions) {
         _numBasisFunctions = std::vector<unsigned int>(
@@ -102,11 +97,12 @@ public:
     }
 
     // Build B-spline
-    BSpline build() const {
-        BSplineBasis basis{computeKnotVectors(), _degree};
+    template <unsigned degree = 3>
+    BSpline<degree> build() const {
+        BSplineBasis<degree> basis{computeKnotVectors(degree)};
         auto coefficients = computeCoefficients(basis);
 
-        return BSpline(std::move(coefficients), std::move(basis));
+        return {std::move(coefficients), std::move(basis)};
     }
 
 private:
@@ -120,7 +116,8 @@ private:
 
     using matrix = Eigen::SparseMatrix<double, Eigen::RowMajor>;
 
-    auto computeBasisFunctionMatrix(BSplineBasis const& basis) const {
+    template <class B>
+    auto computeBasisFunctionMatrix(B const& basis) const {
         unsigned int numVariables = _data.getNumVariables();
         unsigned int numSamples   = _data.getNumSamples();
 
@@ -156,7 +153,8 @@ private:
     * Function for generating second order finite-difference matrix, which is used for penalizing the
     * (approximate) second derivative in control point calculation for P-splines.
     */
-    auto getSecondOrderFiniteDifferenceMatrix(BSplineBasis const& basis) const {
+    template <class B>
+    auto getSecondOrderFiniteDifferenceMatrix(B const& basis) const {
         unsigned int numVariables = basis.getNumVariables();
 
         // Number of (total) basis functions - defines the number of columns in D
@@ -256,7 +254,8 @@ private:
     * R = Regularization matrix,
     * alpha = regularization parameter.
     */
-    DenseVector computeCoefficients(BSplineBasis const& basis) const {
+    template <class B>
+    DenseVector computeCoefficients(B const& basis) const {
         auto const B = computeBasisFunctionMatrix(basis);
         matrix A;
         DenseVector b = getSamplePointValues();
@@ -338,7 +337,8 @@ private:
     }
 
     // Control point computations
-    DenseVector computeBSplineCoefficients(BSpline const& bspline) const;
+    template <class S>
+    DenseVector computeBSplineCoefficients(S const& bspline) const;
     DenseVector getSamplePointValues() const {
         DenseVector B(_data.getNumSamples());
 
@@ -350,7 +350,7 @@ private:
     }
 
     // Computing knots
-    std::vector<std::vector<double>> computeKnotVectors() const {
+    std::vector<std::vector<double>> computeKnotVectors(unsigned degree) const {
         std::vector<std::vector<double>> grid = _data._getTableX();
 
         std::vector<std::vector<double>> knotVectors;
@@ -358,7 +358,7 @@ private:
         for (unsigned int i = 0; i < _data.getNumVariables(); ++i) {
             // Compute knot vector
             knotVectors.push_back(
-                computeKnotVector(grid[i], _degree, _numBasisFunctions[i]));
+                computeKnotVector(grid[i], degree, _numBasisFunctions[i]));
         }
 
         return knotVectors;
@@ -382,7 +382,6 @@ private:
 
     // Member variables
     data_table _data;
-    unsigned int _degree = 3;
     std::vector<unsigned int> _numBasisFunctions;
     KnotSpacing _knotSpacing;
     Smoothing _smoothing;
