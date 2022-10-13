@@ -63,23 +63,28 @@ public:
         }
     }
 
+    // eval workspace memory
+    mutable SparseMatrix product;
+    mutable SparseMatrix product_prev;
+
     // Evaluation
     template <class x_type, class eval_fn, class callable>
     auto eval(x_type const& x, eval_fn& eval, callable tail) const {
         if constexpr (variables == 1) {
             return tail(eval(bases[0], 0, x));
         } else if constexpr (variables == 2) {
-            return tail(kroneckerProduct(
-                            eval(bases[0], 0, x[0]),
-                            eval(bases[1], 1, x[1]))
-                            .eval());
+            product = kroneckerProduct(
+                eval(bases[0], 0, x[0]),
+                eval(bases[1], 1, x[1]));
+            return tail(product);
         } else {
             assert(!bases.empty());
 
-            SparseMatrix product = eval(bases[0], 0, x[0]);
-            SparseMatrix product_prev;
+            product = kroneckerProduct(
+                eval(bases[0], 0, x[0]),
+                eval(bases[1], 1, x[1]));
 
-            for (int i = 1, I = variables; i < I; ++i) {
+            for (int i = 2; i < variables; ++i) {
                 product.swap(product_prev);
                 product =
                     kroneckerProduct(product_prev, eval(bases[i], i, x[i]));
