@@ -146,8 +146,6 @@ private:
 
     // Helper functions
     bool pointInDomain(DenseVector x) const;
-
-    friend bool operator==(BSpline const& lhs, BSpline const& rhs);
 };
 
 // Computes knot averages.

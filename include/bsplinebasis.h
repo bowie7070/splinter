@@ -206,8 +206,6 @@ public:
 
 private:
     bases_type bases;
-
-    friend bool operator==(BSplineBasis const& lhs, BSplineBasis const& rhs);
 };
 
 template <unsigned d, unsigned v>

@@ -195,11 +195,6 @@ private:
     // Member variables
     std::vector<double> knots;
     unsigned int targetNumBasisfunctions;
-
-    friend bool
-    operator==(BSplineBasis1D const& lhs, BSplineBasis1D const& rhs);
-    friend bool
-    operator!=(BSplineBasis1D const& lhs, BSplineBasis1D const& rhs);
 };
 
 template <unsigned d>
