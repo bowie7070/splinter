@@ -155,7 +155,7 @@ private:
     */
     template <class B>
     auto getSecondOrderFiniteDifferenceMatrix(B const& basis) const {
-        unsigned int numVariables = basis.getNumVariables();
+        static constexpr unsigned numVariables = B::variables;
 
         // Number of (total) basis functions - defines the number of columns in D
         unsigned int numCols = basis.getNumBasisFunctions();
