@@ -42,7 +42,7 @@ struct basis1d_eval_cached {
 template <unsigned _degree, unsigned _variables>
 class BSplineBasis {
 public:
-    static constexpr unsigned degree = _degree;
+    static constexpr unsigned degree    = _degree;
     static constexpr unsigned variables = _variables;
 
     using bases_type = std::vector<BSplineBasis1D<degree>>;
@@ -70,8 +70,11 @@ public:
     // Evaluation
     template <class x_type, class eval_fn, class callable>
     auto eval(x_type const& x, eval_fn& eval, callable tail) const {
-        if constexpr (variables == 1) {
+        if constexpr (std::is_arithmetic_v<x_type>) {
             return tail(eval(bases[0], 0, x));
+
+        } else if constexpr (variables == 1) {
+            return tail(eval(bases[0], 0, x[0]));
 
         } else if constexpr (variables == 2) {
             product = kroneckerProduct(
