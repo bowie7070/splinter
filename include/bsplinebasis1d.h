@@ -520,7 +520,7 @@ SparseMatrix BSplineBasis1D<d>::buildKnotInsertionMatrix(
  */
 template <unsigned d>
 int BSplineBasis1D<d>::indexHalfopenInterval(double x) const {
-    assert(x < knots.front() || x > knots.back());
+    assert(insideSupport(x));
 
     // Find first knot that is larger than x
     std::vector<double>::const_iterator it =
@@ -534,7 +534,7 @@ int BSplineBasis1D<d>::indexHalfopenInterval(double x) const {
 template <unsigned d>
 SparseMatrix BSplineBasis1D<d>::reduceSupport(double lb, double ub) {
     // Check bounds
-    assert(lb < knots.front() || ub > knots.back());
+    assert(!(lb < knots.front() || ub > knots.back()));
 
     unsigned int k = degree + 1;
 
